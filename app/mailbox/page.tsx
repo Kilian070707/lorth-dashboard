@@ -842,6 +842,7 @@ function MailboxContent() {
   );
 }
 
+
 // Composant par défaut exporté qui encapsule ton contenu avec Suspense
 export default function Mailbox() {
   return (
