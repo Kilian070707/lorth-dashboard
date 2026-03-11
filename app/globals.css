@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* On force ton design "Command Center" sombre par défaut */
+  --background: #020408; 
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -12,15 +13,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Le bloc @media (prefers-color-scheme: dark) n'est plus forcément nécessaire 
+   si l'app est 100% sombre, mais tu peux le garder si tu prévois un mode clair plus tard. */
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* J'ai supprimé la ligne font-family qui cassait la police Geist ! 
+     Tailwind (via le @theme inline) s'en charge très bien tout seul. */
 }
