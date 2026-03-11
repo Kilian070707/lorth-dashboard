@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Users, Zap, Video, CheckCircle, TrendingUp, AlertCircle, RefreshCcw, ArrowUpRight, ArrowDownRight, Activity, MessageCircle, AlertTriangle, Info, ExternalLink, Linkedin, Database, Settings, Bot, Mail, MessageSquare, Search, Menu, X, CalendarDays, ChevronLeft, ChevronRight, Beaker } from 'lucide-react';
+import { Users, Zap, Video, CheckCircle, TrendingUp, AlertCircle, RefreshCcw, ArrowUpRight, ArrowDownRight, Activity, MessageCircle, Info, ExternalLink, Linkedin, Database, Settings, Bot, Mail, MessageSquare, Search, Menu, X, CalendarDays, ChevronLeft, ChevronRight, Beaker } from 'lucide-react';
 
 type TimeRange = 'today' | 'week' | 'month' | 'year' | 'all' | 'custom';
 
@@ -20,6 +20,7 @@ const PerplexityIcon = ({ className }: { className?: string }) => (
 
 export default function Dashboard() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [allLeads, setAllLeads] = useState<any[]>([]);
@@ -50,6 +51,7 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
+    setMounted(true);
     document.title = "LORTH - Dashboard";
     loadData();
   }, []);
@@ -111,11 +113,11 @@ export default function Dashboard() {
       <div className="p-5 w-[300px] sm:w-[320px]">
         <div className="flex justify-between items-center mb-5">
           <button onClick={() => setCalendarView(new Date(year, month - 1, 1))} className="p-2 hover:bg-white/10 rounded-md text-slate-400 transition-colors"><ChevronLeft className="w-5 h-5"/></button>
-          <span className="text-sm font-bold text-white capitalize">{calendarView.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span>
+          <span className="text-sm font-bold text-white capitalize"><span>{calendarView.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span></span>
           <button onClick={() => setCalendarView(new Date(year, month + 1, 1))} className="p-2 hover:bg-white/10 rounded-md text-slate-400 transition-colors"><ChevronRight className="w-5 h-5"/></button>
         </div>
         <div className="grid grid-cols-7 gap-1 mb-2 text-center">
-          {['Lu','Ma','Me','Je','Ve','Sa','Di'].map(d => <div key={d} className="text-[10px] font-extrabold text-slate-500">{d}</div>)}
+          {['Lu','Ma','Me','Je','Ve','Sa','Di'].map(d => <div key={d} className="text-[10px] font-extrabold text-slate-500"><span>{d}</span></div>)}
         </div>
         <div className="grid grid-cols-7 gap-1">
           {Array.from({ length: startDayIndex }).map((_, i) => <div key={`empty-${i}`} className="w-full aspect-square" />)}
@@ -132,7 +134,7 @@ export default function Dashboard() {
 
              return (
                <button key={day} onClick={() => handleDayClick(dateStr)} className={`w-full aspect-square text-[12px] font-bold flex items-center justify-center transition-all ${bgClass}`}>
-                 {day}
+                 <span>{day}</span>
                </button>
              );
           })}
@@ -325,9 +327,9 @@ export default function Dashboard() {
     const Icon = isPositive ? ArrowUpRight : isNeutral ? TrendingUp : ArrowDownRight;
 
     return (
-      <div className={`flex items-center gap-1 text-[10px] font-bold ${color} px-2 py-0.5 rounded-full border border-white/5`}>
-        <Icon className="w-3 h-3" />
-        {isPositive ? '+' : ''}{value}{isRate ? '%' : '%'}
+      <div className={`flex items-center gap-0.5 sm:gap-1 text-[8px] sm:text-[10px] font-bold ${color} px-1 sm:px-2 py-0.5 rounded-md sm:rounded-full border border-white/5`}>
+        <Icon className="w-2 h-2 sm:w-3 sm:h-3" />
+        <span>{isPositive ? '+' : ''}{value}{isRate ? '%' : '%'}</span>
       </div>
     );
   };
@@ -336,13 +338,23 @@ export default function Dashboard() {
     setStatInfo({ title, description });
   };
 
+  const formatPipeline = (val: number) => {
+      if (val >= 1000) return (val / 1000).toFixed(1).replace('.0', '') + 'k €';
+      return val + ' €';
+  };
+
   return (
     <div className="flex h-[100dvh] bg-[#020408] text-slate-100 font-sans antialiased overflow-hidden relative">
       
+      {/* ÉCRAN NOIR DE LANCEMENT (FADE OUT) */}
+      <div className={`fixed inset-0 bg-black z-[9999] pointer-events-none transition-opacity duration-1000 ease-in-out ${mounted ? 'opacity-0' : 'opacity-100'}`}></div>
+
       <style>{`
         @keyframes appleFadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .animate-apple-fade { animation: appleFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
         .fast-spin { animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
 
       {/* MODALE D'EXPLICATION DES STATS */}
@@ -352,10 +364,10 @@ export default function Dashboard() {
             <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-4 bg-blue-500/10 text-blue-400">
               <Info className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-extrabold text-white mb-2">{statInfo.title}</h3>
-            <p className="text-slate-400 text-sm mb-6 leading-relaxed">{statInfo.description}</p>
+            <h3 className="text-lg font-extrabold text-white mb-2"><span>{statInfo.title}</span></h3>
+            <p className="text-slate-400 text-sm mb-6 leading-relaxed"><span>{statInfo.description}</span></p>
             <button onClick={() => setStatInfo(null)} className="w-full py-2.5 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5">
-              J'ai compris
+              <span>J'ai compris</span>
             </button>
           </div>
         </div>
@@ -464,30 +476,26 @@ export default function Dashboard() {
       {/* ZONE CENTRALE : Le contenu de la page */}
       <main className="flex-1 flex flex-col h-[100dvh] relative overflow-hidden min-w-0">
         
-        {/* HEADER MOBILE UNIQUEMENT - Bouton à gauche, pas de logo */}
-        <div className="md:hidden flex items-center justify-start px-4 py-4 border-b border-white/5 bg-[#03060D] z-30 pt-[max(1rem,env(safe-area-inset-top))]">
-          <button onClick={() => setMobileMenuOpen(true)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors">
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
-
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none hidden md:block"></div>
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none md:hidden"></div>
         
         {loading ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500 animate-in fade-in duration-300">
              <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full fast-spin"></div>
-             <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Chargement</span>
+             <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500"><span>Chargement</span></span>
           </div>
         ) : (
-          /* Ajout de min-h-0 essentiel pour autoriser le scroll du flex child sur mobile */
-          <div className="flex-1 flex flex-col w-full max-w-6xl mx-auto animate-apple-fade px-4 md:px-8 pt-6 md:pt-10 pb-4 relative z-10 min-h-0">
+          <div className="flex-1 flex flex-col w-full max-w-6xl mx-auto animate-apple-fade px-4 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] md:pt-10 pb-4 relative z-10 min-h-0">
             
-            {/* Marge augmentée mb-10 md:mb-14 */}
-            <header className="flex flex-col xl:flex-row xl:justify-between xl:items-end gap-6 mt-2 md:mt-6 mb-10 md:mb-14">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-2 text-center xl:text-left tracking-tight">Dashboard Visuel</h1>
-                <p className="text-slate-400 text-xs md:text-[13px] font-medium text-center xl:text-left">Performances d'acquisition en temps réel.</p>
+            <header className="flex flex-col xl:flex-row xl:justify-between xl:items-end gap-6 mb-8 md:mb-14">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 md:gap-0">
+                  <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors flex-shrink-0 mr-1">
+                    <Menu className="w-6 h-6" />
+                  </button>
+                  <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight"><span>Dashboard Visuel</span></h1>
+                </div>
+                <p className="text-slate-400 text-xs md:text-[13px] font-medium mt-1 md:mt-2 ml-10 md:ml-0"><span>Performances d'acquisition en temps réel.</span></p>
               </div>
               
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
@@ -496,7 +504,7 @@ export default function Dashboard() {
                   <div className="relative flex justify-center animate-in fade-in slide-in-from-right-4 w-full sm:w-auto">
                     <button onClick={() => setShowDatePicker(!showDatePicker)} className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-5 py-2 text-xs font-bold transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] w-full sm:w-auto">
                       <CalendarDays className="w-4 h-4" />
-                      {getDateLabel()}
+                      <span>{getDateLabel()}</span>
                     </button>
 
                     {showDatePicker && (
@@ -507,14 +515,14 @@ export default function Dashboard() {
                   </div>
                 )}
 
-                <div className="flex items-center bg-[#0A0F1C] border border-white/10 rounded-lg p-1 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar">
-                  <button onClick={() => {setTimeRange('today'); setShowDatePicker(false);}} className={`px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors whitespace-nowrap ${timeRange === 'today' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}>24h</button>
-                  <button onClick={() => {setTimeRange('week'); setShowDatePicker(false);}} className={`px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors whitespace-nowrap ${timeRange === 'week' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}>7J</button>
-                  <button onClick={() => {setTimeRange('month'); setShowDatePicker(false);}} className={`px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors whitespace-nowrap ${timeRange === 'month' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}>30J</button>
-                  <button onClick={() => {setTimeRange('year'); setShowDatePicker(false);}} className={`px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors whitespace-nowrap ${timeRange === 'year' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}>12M</button>
-                  <button onClick={() => {setTimeRange('all'); setShowDatePicker(false);}} className={`px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors whitespace-nowrap ${timeRange === 'all' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}>Global</button>
-                  <div className="w-px h-4 bg-white/10 mx-1 shrink-0"></div>
-                  <button onClick={() => setTimeRange('custom')} className={`px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors whitespace-nowrap ${timeRange === 'custom' ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-white'}`}>Dates</button>
+                <div className="flex items-center justify-between bg-[#0A0F1C] border border-white/10 rounded-lg p-1 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar flex-1 sm:flex-none">
+                  <button onClick={() => {setTimeRange('today'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'today' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>24h</span></button>
+                  <button onClick={() => {setTimeRange('week'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'week' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>7J</span></button>
+                  <button onClick={() => {setTimeRange('month'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'month' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>30J</span></button>
+                  <button onClick={() => {setTimeRange('year'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'year' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>12M</span></button>
+                  <button onClick={() => {setTimeRange('all'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'all' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>Global</span></button>
+                  <div className="w-px h-4 bg-white/10 mx-1 shrink-0 hidden sm:block"></div>
+                  <button onClick={() => setTimeRange('custom')} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'custom' ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-white'}`}><span>Dates</span></button>
                 </div>
                 <button onClick={loadData} className="flex-shrink-0 hidden sm:flex items-center justify-center w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">
                   <RefreshCcw className="w-4 h-4 text-slate-300" />
@@ -522,56 +530,88 @@ export default function Dashboard() {
               </div>
             </header>
 
-            {/* Zone qui gère le scroll avec no-scrollbar */}
             <div className="flex-1 overflow-y-auto no-scrollbar -mx-4 md:-mx-8 px-4 md:px-8 pb-[calc(3rem+env(safe-area-inset-bottom))]">
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-8">
-                <div onClick={() => openStatInfo("Pipeline Actif", "Valeur estimée du pipeline basée sur les leads ayant un statut 'Vidéo à tourner', 'Question à traiter', ou 'En conversation'. Chaque lead est valorisé à 2500€.")} className="bg-[#0A0F1C] border border-yellow-500/20 p-5 rounded-2xl shadow-[0_0_20px_rgba(234,179,8,0.08)] flex flex-col gap-y-4 relative overflow-hidden hover:border-yellow-500/40 hover:scale-[1.02] transition-all cursor-pointer group">
+              <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-4 mb-8">
+                
+                {/* Pipeline Actif */}
+                <div onClick={() => openStatInfo("Pipeline Actif", "Valeur estimée du pipeline basée sur les leads ayant un statut 'Vidéo à tourner', 'Question à traiter', ou 'En conversation'. Chaque lead est valorisé à 2500€.")} className="bg-[#0A0F1C] border border-yellow-500/20 p-2.5 sm:p-5 rounded-2xl shadow-[0_0_20px_rgba(234,179,8,0.08)] flex flex-col justify-between aspect-square relative overflow-hidden hover:border-yellow-500/40 hover:scale-[1.02] transition-all cursor-pointer group">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 blur-[40px] rounded-full pointer-events-none"></div>
-                  <div className="flex justify-between items-start relative z-10">
-                    <div className="p-2 bg-yellow-500/20 rounded-lg"><Zap className="w-4 h-4 text-yellow-400" /></div>
+                  <div className="flex justify-between items-start relative z-10 w-full">
+                    <div className="p-1.5 sm:p-2 bg-yellow-500/20 rounded-lg"><Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" /></div>
                   </div>
-                  <div className="relative z-10 mt-2">
-                    <h3 className="text-2xl font-black text-white tracking-tight">{stats.pipelineValue.toLocaleString('fr-FR')} €</h3>
-                    <p className="text-[10px] font-bold text-yellow-400/80 mt-1.5 uppercase tracking-wider">Pipeline</p>
+                  <div className="relative z-10 mt-auto">
+                    <h3 className="text-[15px] sm:text-2xl font-black text-white tracking-tight leading-none"><span>{formatPipeline(stats.pipelineValue)}</span></h3>
+                    <p className="text-[8px] sm:text-[10px] font-bold text-yellow-400/80 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Pipeline</span></p>
                   </div>
                 </div>
 
-                <div onClick={() => openStatInfo("Leads Contactés", "Le nombre total de prospects uniques ayant reçu au moins un e-mail de vos séquences sur la période sélectionnée.")} className="bg-[#0A0F1C] border border-white/5 p-5 rounded-2xl shadow-xl flex flex-col gap-y-4 hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start"><div className="p-2 bg-blue-500/10 rounded-lg"><Users className="w-4 h-4 text-blue-400" /></div><DiffBadge value={stats.diffs.totalLeads} /></div>
-                  <div className="mt-2"><h3 className="text-2xl font-black text-white tracking-tight">{stats.totalLeads}</h3><p className="text-[10px] font-bold text-slate-500 mt-1.5 uppercase tracking-wider">Leads</p></div>
+                {/* Leads Contactés */}
+                <div onClick={() => openStatInfo("Leads Contactés", "Le nombre total de prospects uniques ayant reçu au moins un e-mail de vos séquences sur la période sélectionnée.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                  <div className="flex justify-between items-start w-full">
+                    <div className="p-1.5 sm:p-2 bg-blue-500/10 rounded-lg"><Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" /></div>
+                    <DiffBadge value={stats.diffs.totalLeads} />
+                  </div>
+                  <div className="mt-auto">
+                    <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.totalLeads}</span></h3>
+                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Leads</span></p>
+                  </div>
                 </div>
 
-                <div onClick={() => openStatInfo("Taux de Réponse", "Le pourcentage de prospects qui ont répondu à vos emails.")} className="bg-[#0A0F1C] border border-white/5 p-5 rounded-2xl shadow-xl flex flex-col gap-y-4 hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start"><div className="p-2 bg-emerald-500/10 rounded-lg"><TrendingUp className="w-4 h-4 text-emerald-400" /></div><DiffBadge value={stats.diffs.replyRate} isRate={true} /></div>
-                  <div className="mt-2"><h3 className="text-2xl font-black text-white tracking-tight">{stats.replyRate}%</h3><p className="text-[10px] font-bold text-slate-500 mt-1.5 uppercase tracking-wider">Réponses</p></div>
+                {/* Taux de Réponse */}
+                <div onClick={() => openStatInfo("Taux de Réponse", "Le pourcentage de prospects qui ont répondu à vos emails.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                  <div className="flex justify-between items-start w-full">
+                    <div className="p-1.5 sm:p-2 bg-emerald-500/10 rounded-lg"><TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" /></div>
+                    <DiffBadge value={stats.diffs.replyRate} isRate={true} />
+                  </div>
+                  <div className="mt-auto">
+                    <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.replyRate}%</span></h3>
+                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Réponses</span></p>
+                  </div>
                 </div>
 
-                <div onClick={() => openStatInfo("Vidéos à Tourner", "Leads qualifiés attendant une vidéo sur-mesure.")} className="bg-[#0A0F1C] border border-white/5 p-5 rounded-2xl shadow-xl flex flex-col gap-y-4 hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start"><div className="p-2 bg-purple-500/10 rounded-lg"><Video className="w-4 h-4 text-purple-400" /></div><DiffBadge value={stats.diffs.videosPending} /></div>
-                  <div className="mt-2"><h3 className="text-2xl font-black text-white tracking-tight">{stats.videosPending}</h3><p className="text-[10px] font-bold text-slate-500 mt-1.5 uppercase tracking-wider">Vidéos</p></div>
+                {/* Vidéos à Tourner */}
+                <div onClick={() => openStatInfo("Vidéos à Tourner", "Leads qualifiés attendant une vidéo sur-mesure.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                  <div className="flex justify-between items-start w-full">
+                    <div className="p-1.5 sm:p-2 bg-purple-500/10 rounded-lg"><Video className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400" /></div>
+                    <DiffBadge value={stats.diffs.videosPending} />
+                  </div>
+                  <div className="mt-auto">
+                    <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.videosPending}</span></h3>
+                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Vidéos</span></p>
+                  </div>
                 </div>
 
-                <div onClick={() => openStatInfo("Outreach Successful", "Nombre de leads convertis ou traités avec succès.")} className="bg-[#0A0F1C] border border-white/5 p-5 rounded-2xl shadow-xl flex flex-col gap-y-4 hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start"><div className="p-2 bg-teal-500/10 rounded-lg"><CheckCircle className="w-4 h-4 text-teal-400" /></div><DiffBadge value={stats.diffs.objectionsWon} /></div>
-                  <div className="mt-2"><h3 className="text-2xl font-black text-white tracking-tight">{stats.objectionsWon}</h3><p className="text-[10px] font-bold text-slate-500 mt-1.5 uppercase tracking-wider">Succès</p></div>
+                {/* Outreach Successful */}
+                <div onClick={() => openStatInfo("Outreach Successful", "Nombre de leads convertis ou traités avec succès.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                  <div className="flex justify-between items-start w-full">
+                    <div className="p-1.5 sm:p-2 bg-teal-500/10 rounded-lg"><CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400" /></div>
+                    <DiffBadge value={stats.diffs.objectionsWon} />
+                  </div>
+                  <div className="mt-auto">
+                    <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.objectionsWon}</span></h3>
+                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Succès</span></p>
+                  </div>
                 </div>
 
-                <div onClick={() => openStatInfo("Conversations en cours", "Leads attendant une réponse humaine de votre part.")} className="bg-[#0A0F1C] border border-white/5 p-5 rounded-2xl shadow-xl flex flex-col gap-y-4 hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                    <div className="flex justify-between items-start"><div className="p-2 bg-orange-500/10 rounded-lg"><MessageCircle className="w-4 h-4 text-orange-400" /></div><DiffBadge value={stats.diffs.ongoingConversations} /></div>
-                    <div className="mt-2"><h3 className="text-2xl font-black text-white tracking-tight">{stats.ongoingConversations}</h3><p className="text-[10px] font-bold text-slate-500 mt-1.5 uppercase tracking-wider">En cours</p></div>
+                {/* Conversations en cours */}
+                <div onClick={() => openStatInfo("Conversations en cours", "Leads attendant une réponse humaine de votre part.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                    <div className="flex justify-between items-start w-full">
+                      <div className="p-1.5 sm:p-2 bg-orange-500/10 rounded-lg"><MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400" /></div>
+                      <DiffBadge value={stats.diffs.ongoingConversations} />
+                    </div>
+                    <div className="mt-auto">
+                      <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.ongoingConversations}</span></h3>
+                      <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>En cours</span></p>
+                    </div>
                 </div>
 
-                <div onClick={() => openStatInfo("Erreurs Nodes IA", "Nombre de fois où l'IA n'a pas pu classifier un mail.")} className="bg-[#0A0F1C] border border-white/5 p-5 rounded-2xl shadow-xl flex flex-col gap-y-4 hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start"><div className="p-2 bg-red-500/10 rounded-lg"><AlertTriangle className="w-4 h-4 text-red-400" /></div><DiffBadge value={stats.diffs.aiErrors} reversedColors={true} /></div>
-                  <div className="mt-2"><h3 className="text-2xl font-black text-white tracking-tight">{stats.aiErrors}</h3><p className="text-[10px] font-bold text-slate-500 mt-1.5 uppercase tracking-wider">Erreurs IA</p></div>
-                </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
                 
                 <div className="lg:col-span-2 bg-[#0A0F1C] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col">
-                  <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-4">Acquisition</h3>
+                  <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-4"><span>Acquisition</span></h3>
                   <div className="flex-1 w-full min-h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={stats.graphData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
@@ -588,7 +628,7 @@ export default function Dashboard() {
 
                 <div className="lg:col-span-1 flex flex-col gap-6">
                   <div className="bg-[#0A0F1C] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col flex-1">
-                    <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-2">Analyse des Objections</h3>
+                    <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-2"><span>Analyse des Objections</span></h3>
                     {stats.objectionTypesData.length > 0 ? (
                       <div className="flex-1 w-full min-h-[160px] flex items-center justify-center">
                         <ResponsiveContainer width="100%" height="100%">
@@ -602,19 +642,19 @@ export default function Dashboard() {
                         </ResponsiveContainer>
                       </div>
                     ) : (
-                      <div className="flex-1 flex items-center justify-center text-sm font-medium text-slate-500 min-h-[160px]">Aucune donnée d'objection</div>
+                      <div className="flex-1 flex items-center justify-center text-sm font-medium text-slate-500 min-h-[160px]"><span>Aucune donnée d'objection</span></div>
                     )}
                   </div>
                   <div className="bg-[#0A0F1C] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col">
-                    <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-4">Santé Système</h3>
+                    <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-4"><span>Santé Système</span></h3>
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center justify-between p-3.5 rounded-xl bg-red-500/5 border border-red-500/10">
-                        <div className="flex items-center gap-3"><AlertCircle className="w-5 h-5 text-red-400" /><div><h4 className="text-sm font-bold text-white">Bounces</h4></div></div>
-                        <span className="text-xl font-black text-red-400">{stats.bounced}</span>
+                        <div className="flex items-center gap-3"><AlertCircle className="w-5 h-5 text-red-400" /><div><h4 className="text-sm font-bold text-white"><span>Bounces</span></h4></div></div>
+                        <span className="text-xl font-black text-red-400"><span>{stats.bounced}</span></span>
                       </div>
                       <div className="flex items-center justify-between p-3.5 rounded-xl bg-white/5 border border-white/5">
-                        <div className="flex items-center gap-3"><div className="w-5 h-5 rounded-full border-2 border-emerald-500 flex items-center justify-center"><div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div></div><div><h4 className="text-sm font-bold text-white">Serveur n8n</h4></div></div>
-                        <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md">Online</span>
+                        <div className="flex items-center gap-3"><div className="w-5 h-5 rounded-full border-2 border-emerald-500 flex items-center justify-center"><div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div></div><div><h4 className="text-sm font-bold text-white"><span>Serveur n8n</span></h4></div></div>
+                        <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md"><span>Online</span></span>
                       </div>
                     </div>
                   </div>

@@ -396,6 +396,7 @@ function MailboxContent() {
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
         .fast-spin { animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
       `}</style>
 
@@ -598,12 +599,6 @@ function MailboxContent() {
 
       <main className="flex-1 flex flex-col h-[100dvh] relative overflow-hidden min-w-0">
         
-        <div className={`md:hidden items-center justify-start px-4 py-4 border-b border-white/5 bg-[#03060D] z-30 pt-[max(1rem,env(safe-area-inset-top))] ${isMobileChatOpen ? 'hidden' : 'flex'}`}>
-          <button onClick={() => setMobileMenuOpen(true)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors">
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
-
         <div className="flex-1 flex overflow-hidden relative">
           
           {loading && (
@@ -617,11 +612,15 @@ function MailboxContent() {
 
           <div className={`w-full md:w-1/3 md:max-w-[360px] border-r border-white/5 bg-[#050811] flex-col overflow-hidden z-10 relative ${isMobileChatOpen ? 'hidden md:flex' : 'flex'}`}>
             
-            <div className="p-4 border-b border-white/5 bg-[#03060D]/50 relative">
-              <button onClick={() => setShowCentralMenu(!showCentralMenu)} className="w-full flex items-center justify-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 transition-colors group cursor-pointer">
-                <span className="text-[13px] font-extrabold text-white uppercase tracking-wider">{getViewTitle()}</span>
-                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors ${currentView === 'urgent' && !searchQuery ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-300'}`}>{displayLeads.length}</span>
-                {searchQuery === '' && <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-300 ${showCentralMenu ? 'rotate-180' : ''}`} />}
+            <div className="p-4 border-b border-white/5 bg-[#03060D] md:bg-[#03060D]/50 relative flex items-center gap-3 pt-[max(1rem,env(safe-area-inset-top))] md:pt-4">
+              <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors flex-shrink-0">
+                <Menu className="w-5 h-5" />
+              </button>
+              
+              <button onClick={() => setShowCentralMenu(!showCentralMenu)} className="flex-1 flex items-center justify-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 transition-colors group cursor-pointer">
+                <span className="text-[13px] font-extrabold text-white uppercase tracking-wider truncate">{getViewTitle()}</span>
+                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors flex-shrink-0 ${currentView === 'urgent' && !searchQuery ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-300'}`}>{displayLeads.length}</span>
+                {searchQuery === '' && <ChevronDown className={`w-4 h-4 text-slate-500 flex-shrink-0 transition-transform duration-300 ${showCentralMenu ? 'rotate-180' : ''}`} />}
               </button>
               
               {showCentralMenu && searchQuery === '' && (
