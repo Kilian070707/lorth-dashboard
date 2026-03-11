@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, ChevronDown, Activity, Zap, CheckCircle, Clock, AlertTriangle, AlertCircle, Trash2, PauseCircle, Send, Info, Filter, MessageCircle, MessageSquare, Menu, X, ArrowLeft, Beaker, Bot } from 'lucide-react';
 
-export default function Mailbox() {
+function MailboxContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -22,7 +22,6 @@ export default function Mailbox() {
 
   const [showConfirmSend, setShowConfirmSend] = useState(false);
   
-  // NOUVEAU : On utilise toujours cet état, mais il servira pour le Toast
   const [alertPopup, setAlertPopup] = useState<{show: boolean, title: string, message: string, type: 'success' | 'error'} | null>(null);
   
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
@@ -44,7 +43,6 @@ export default function Mailbox() {
   
   const actionStatuses = ['Question à traiter', 'Objection à traiter', 'Vidéo à tourner', 'Erreur IA', 'Erreur IA Relance', 'Erreur IA Mail', 'En conversation', 'Ghost à relancer'];
 
-  // NOUVEAU : Auto-fermeture du Toast après 4 secondes
   useEffect(() => {
     if (alertPopup?.show) {
       const timer = setTimeout(() => {
@@ -119,8 +117,8 @@ export default function Mailbox() {
         
         const q = searchParams?.get('q');
         if (q) {
-           const matches = enhancedLeads.filter((l: any) => l.name.toLowerCase().includes(q.toLowerCase()) || l.company.toLowerCase().includes(q.toLowerCase()) || l.email.toLowerCase().includes(q.toLowerCase()));
-           if (matches.length > 0 && window.innerWidth >= 768) handleSelectLead(matches[0]);
+          const matches = enhancedLeads.filter((l: any) => l.name.toLowerCase().includes(q.toLowerCase()) || l.company.toLowerCase().includes(q.toLowerCase()) || l.email.toLowerCase().includes(q.toLowerCase()));
+          if (matches.length > 0 && window.innerWidth >= 768) handleSelectLead(matches[0]);
         } else {
           const urgents = enhancedLeads.filter((l: any) => actionStatuses.includes(l.status) && !l.isArchived);
           if (urgents.length > 0) {
@@ -616,8 +614,8 @@ export default function Mailbox() {
         {loading && (
           <div className="absolute inset-0 z-[200] flex items-center justify-center bg-[#020408]/70 backdrop-blur-md animate-in fade-in duration-200">
             <div className="flex flex-col items-center gap-4">
-               <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full fast-spin"></div>
-               <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Chargement</span>
+              <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full fast-spin"></div>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Chargement</span>
             </div>
           </div>
         )}
@@ -695,9 +693,9 @@ export default function Mailbox() {
               <div className="flex gap-2 relative">
                 <button onClick={() => setShowFolderMenu(!showFolderMenu)} className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-xs font-bold text-slate-300 transition-colors">Classer</button>
                 {currentView === 'archives' ? (
-                   <button onClick={() => actionSelected('restore')} className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-xs font-bold text-emerald-400 transition-colors">Désarchiver</button>
+                  <button onClick={() => actionSelected('restore')} className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-xs font-bold text-emerald-400 transition-colors">Désarchiver</button>
                 ) : (
-                   <button onClick={() => actionSelected('archive')} className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-lg text-xs font-bold text-rose-400 transition-colors">Archiver</button>
+                  <button onClick={() => actionSelected('archive')} className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-lg text-xs font-bold text-rose-400 transition-colors">Archiver</button>
                 )}
                 {showFolderMenu && (
                   <div className="absolute top-full mt-2 right-0 bg-[#0A0F1C] border border-white/10 rounded-lg shadow-xl overflow-hidden py-1 w-40 max-h-48 overflow-y-auto">
@@ -841,5 +839,18 @@ export default function Mailbox() {
       </div>
 
     </div>
+  );
+}
+
+// Composant par défaut exporté qui encapsule ton contenu avec Suspense
+export default function Mailbox() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen w-full items-center justify-center bg-[#020408] text-slate-500 text-sm font-bold uppercase tracking-widest">
+        Chargement de la boîte mail...
+      </div>
+    }>
+      <MailboxContent />
+    </Suspense>
   );
 }
