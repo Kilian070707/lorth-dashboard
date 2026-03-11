@@ -388,7 +388,6 @@ function MailboxContent() {
         .animate-apple-fade { animation: appleFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         .animate-apple-fade-delay { opacity: 0; animation: appleFadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s forwards; }
         
-        /* NOUVEAU : Animation d'entrée pour le Toast (du bas vers le haut) */
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
@@ -403,7 +402,7 @@ function MailboxContent() {
       {/* --- MODALES DOSSIERS --- */}
       {showNewFolderModal && (
         <div className="absolute inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-          <div className="bg-[#0A0F1C] border border-white/10 p-6 rounded-2xl shadow-2xl max-w-sm w-full animate-apple-fade">
+          <div className="bg-[#0A0F1C] border border-white/10 p-6 rounded-2xl shadow-2xl max-sm w-full animate-apple-fade">
             <h3 className="text-lg font-extrabold text-white mb-4">Nouveau dossier</h3>
             <input 
               type="text" value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Nom du dossier..."
@@ -420,7 +419,7 @@ function MailboxContent() {
 
       {showRenameFolderModal && (
         <div className="absolute inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-          <div className="bg-[#0A0F1C] border border-white/10 p-6 rounded-2xl shadow-2xl max-w-sm w-full animate-apple-fade">
+          <div className="bg-[#0A0F1C] border border-white/10 p-6 rounded-2xl shadow-2xl max-sm w-full animate-apple-fade">
             <h3 className="text-lg font-extrabold text-white mb-4">Renommer "{renameTarget}"</h3>
             <input 
               type="text" value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Nouveau nom..."
@@ -437,7 +436,7 @@ function MailboxContent() {
 
       {showDeleteFolderModal && (
         <div className="absolute inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-          <div className="bg-[#0A0F1C] border border-rose-500/30 p-6 rounded-2xl shadow-2xl max-w-sm w-full animate-apple-fade">
+          <div className="bg-[#0A0F1C] border border-rose-500/30 p-6 rounded-2xl shadow-2xl max-sm w-full animate-apple-fade">
             <h3 className="text-lg font-extrabold text-white mb-2">Supprimer le dossier ?</h3>
             <p className="text-slate-400 text-sm mb-6 leading-relaxed">
               Êtes-vous sûr de vouloir supprimer le dossier <span className="text-white font-bold">"{folderToDelete}"</span> ?<br/><br/>
@@ -451,7 +450,6 @@ function MailboxContent() {
         </div>
       )}
 
-      {/* NOUVEAU : TOAST NOTIFICATION (Discret en bas à droite/centre) */}
       {alertPopup?.show && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-8 z-[200] animate-slide-up w-[90%] md:w-auto min-w-[300px]">
           <div className={`bg-[#0A0F1C] border rounded-xl shadow-2xl p-4 flex items-center gap-4 ${alertPopup.type === 'success' ? 'border-emerald-500/30' : 'border-rose-500/30'}`}>
@@ -469,10 +467,9 @@ function MailboxContent() {
         </div>
       )}
 
-      {/* Modale Envoi Mail (Reste au centre car c'est une confirmation avant action) */}
       {showConfirmSend && (
         <div className="absolute inset-0 z-[90] flex items-center justify-center bg-black/70 backdrop-blur-md px-4">
-          <div className="bg-[#0A0F1C] border border-white/10 p-6 rounded-2xl shadow-2xl max-w-md w-full animate-apple-fade">
+          <div className="bg-[#0A0F1C] border border-white/10 p-6 rounded-2xl shadow-2xl max-md w-full animate-apple-fade">
             <h3 className="text-lg font-extrabold text-white mb-2">Confirmer l'envoi</h3>
             <p className="text-slate-400 text-sm mb-6 leading-relaxed">
               Envoi à <span className="text-white font-bold">{selectedLead?.email}</span> via <span className="text-white font-bold">{selectedLead?.sender}</span>.
@@ -489,7 +486,6 @@ function MailboxContent() {
         <div className="md:hidden fixed inset-0 bg-black/60 z-[90] backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
       )}
 
-      {/* SIDEBAR GAUCHE */}
       <aside className={`fixed md:relative z-[100] w-64 h-[100dvh] border-r border-white/5 bg-[#03060D] flex flex-col transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
         
         <button onClick={() => setMobileMenuOpen(false)} className="md:hidden absolute top-6 right-4 p-2 text-slate-400 hover:text-white">
@@ -600,17 +596,14 @@ function MailboxContent() {
 
       </aside>
 
-      {/* ZONE CENTRALE (LISTE + CHAT) englobée dans un <main> pour correspondre aux autres pages */}
       <main className="flex-1 flex flex-col h-[100dvh] relative overflow-hidden min-w-0">
         
-        {/* HEADER MOBILE UNIQUEMENT - Bouton à gauche, pas de logo */}
         <div className={`md:hidden items-center justify-start px-4 py-4 border-b border-white/5 bg-[#03060D] z-30 pt-[max(1rem,env(safe-area-inset-top))] ${isMobileChatOpen ? 'hidden' : 'flex'}`}>
           <button onClick={() => setMobileMenuOpen(true)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors">
             <Menu className="w-6 h-6" />
           </button>
         </div>
 
-        {/* WRAPPER DU CONTENU MAILBOX */}
         <div className="flex-1 flex overflow-hidden relative">
           
           {loading && (
@@ -622,7 +615,6 @@ function MailboxContent() {
             </div>
           )}
 
-          {/* LISTE DES LEADS */}
           <div className={`w-full md:w-1/3 md:max-w-[360px] border-r border-white/5 bg-[#050811] flex-col overflow-hidden z-10 relative ${isMobileChatOpen ? 'hidden md:flex' : 'flex'}`}>
             
             <div className="p-4 border-b border-white/5 bg-[#03060D]/50 relative">
@@ -635,23 +627,23 @@ function MailboxContent() {
               {showCentralMenu && searchQuery === '' && (
                   <div className="absolute top-full left-4 right-4 mt-2 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
                     <button onClick={() => {setCurrentView('all'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-white hover:bg-white/5 flex items-center gap-2">
-                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg Boîte Globale
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg> <span>Boîte Globale</span>
                     </button>
                     <button onClick={() => {setCurrentView('urgent'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-white hover:bg-white/5 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3B82F6]"></span> Action Requise
+                      <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3B82F6]"></span> <span>Action Requise</span>
                     </button>
                     <div className="h-px bg-white/5 my-1"></div>
                     <button onClick={() => {setCurrentView('favoris'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-2">
-                      <span className="text-yellow-500/80">★</span> Favoris
+                      <span className="text-yellow-500/80">★</span> <span>Favoris</span>
                     </button>
                     {customFolders.map(f => (
                       <button key={f} onClick={() => {setCurrentView(f); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-2">
-                        <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> {f}
+                        <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> <span>{f}</span>
                       </button>
                     ))}
                     <div className="h-px bg-white/5 my-1"></div>
                     <button onClick={() => {setCurrentView('archives'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/5 flex items-center gap-2">
-                      <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg> Archives
+                      <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg> <span>Archives</span>
                     </button>
                   </div>
               )}
@@ -759,7 +751,6 @@ function MailboxContent() {
             </div>
           </div>
 
-          {/* ZONE DE DISCUSSION */}
           {selectedLead ? (
             <div key={selectedLead.id} className={`flex-1 flex-col relative bg-[#020408] animate-apple-fade ${isMobileChatOpen ? 'flex' : 'hidden md:flex'}`}>
               <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none hidden md:block"></div>
@@ -789,16 +780,16 @@ function MailboxContent() {
                     {isStatusMenuOpen && (
                       <div className="absolute top-full right-0 mt-2 w-56 md:w-64 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
                         <div className="px-3 py-2 border-b border-white/5"><p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Action Requise</p></div>
-                        <button onClick={() => handleStatusChange('Question à traiter')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34D399]"></span> Réponse - Question</button>
-                        <button onClick={() => handleStatusChange('Objection à traiter')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_#FACC15]"></span> Réponse - Objection</button>
-                        <button onClick={() => handleStatusChange('En conversation')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 shadow-[0_0_8px_#FB923C]"></span> En conversation</button>
-                        <button onClick={() => handleStatusChange('Ghost à relancer')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-slate-300 shadow-[0_0_8px_#cbd5e1]"></span> Ghost à relancer</button>
-                        <button onClick={() => handleStatusChange('Vidéo à tourner')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#C084FC]"></span> Vidéo à tourner</button>
+                        <button onClick={() => handleStatusChange('Question à traiter')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34D399]"></span> <span>Réponse - Question</span></button>
+                        <button onClick={() => handleStatusChange('Objection à traiter')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_#FACC15]"></span> <span>Réponse - Objection</span></button>
+                        <button onClick={() => handleStatusChange('En conversation')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 shadow-[0_0_8px_#FB923C]"></span> <span>En conversation</span></button>
+                        <button onClick={() => handleStatusChange('Ghost à relancer')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-slate-300 shadow-[0_0_8px_#cbd5e1]"></span> <span>Ghost à relancer</span></button>
+                        <button onClick={() => handleStatusChange('Vidéo à tourner')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#C084FC]"></span> <span>Vidéo à tourner</span></button>
 
                         <div className="px-3 py-2 border-b border-t border-white/5 mt-1"><p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Terminé / Attente</p></div>
-                        <button onClick={() => handleStatusChange('Objection traitée')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-teal-400 shadow-[0_0_8px_#2DD4BF]"></span> Outreach Successful</button>
-                        <button onClick={() => handleStatusChange('Mail envoyé')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_#60A5FA]"></span> 1er cold outreach</button>
-                        <button onClick={() => handleStatusChange('Désinscrit')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-red-400 shadow-[0_0_8px_#F87171]"></span> Désinscrit</button>
+                        <button onClick={() => handleStatusChange('Objection traitée')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-teal-400 shadow-[0_0_8px_#2DD4BF]"></span> <span>Outreach Successful</span></button>
+                        <button onClick={() => handleStatusChange('Mail envoyé')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_#60A5FA]"></span> <span>1er cold outreach</span></button>
+                        <button onClick={() => handleStatusChange('Désinscrit')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-red-400 shadow-[0_0_8px_#F87171]"></span> <span>Désinscrit</span></button>
                       </div>
                     )}
 
@@ -845,7 +836,6 @@ function MailboxContent() {
 }
 
 
-// Composant par défaut exporté qui encapsule ton contenu avec Suspense
 export default function Mailbox() {
   return (
     <Suspense fallback={
