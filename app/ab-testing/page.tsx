@@ -49,7 +49,6 @@ export default function ABTesting() {
     } catch (err) {
       console.error("Erreur API", err);
     } finally {
-      // Retrait du setTimeout pour plus de réactivité
       setLoading(false);
     }
   };
@@ -117,7 +116,7 @@ export default function ABTesting() {
     };
 
     return (
-      <div className="p-4 w-72"> {/* Élargissement pour meilleur espacement tactile */}
+      <div className="p-4 w-[280px] sm:w-[300px]">
         <div className="flex justify-between items-center mb-4">
           <button onClick={() => setCalView(new Date(year, month - 1, 1))} className="p-2 hover:bg-white/10 rounded-md text-slate-400 transition-colors"><ChevronLeft className="w-5 h-5"/></button>
           <span className="text-sm font-bold text-white capitalize">{calView.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span>
@@ -127,8 +126,7 @@ export default function ABTesting() {
           {['Lu','Ma','Me','Je','Ve','Sa','Di'].map(d => <div key={d} className="text-[10px] font-extrabold text-slate-500">{d}</div>)}
         </div>
         <div className="grid grid-cols-7 gap-1">
-          {/* Agrandissement des cases vides à w-9 h-9 */}
-          {Array.from({ length: startDayIndex }).map((_, i) => <div key={`empty-${i}`} className="w-9 h-9" />)}
+          {Array.from({ length: startDayIndex }).map((_, i) => <div key={`empty-${i}`} className="w-full aspect-square" />)}
           {Array.from({ length: daysInMonth }).map((_, i) => {
              const day = i + 1;
              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -140,35 +138,33 @@ export default function ABTesting() {
              if (isStart || isEnd) bgClass = "bg-blue-600 text-white font-black rounded-lg shadow-[0_0_10px_rgba(37,99,235,0.5)]";
              else if (isBetween) bgClass = "bg-blue-500/20 text-blue-300 rounded-sm";
 
-             // Agrandissement des boutons à w-9 h-9 pour iOS
-             return (<button key={day} onClick={() => handleDayClick(dateStr)} className={`w-9 h-9 text-[11px] font-bold flex items-center justify-center transition-all ${bgClass}`}>{day}</button>);
+             return (<button key={day} onClick={() => handleDayClick(dateStr)} className={`w-full aspect-square text-[11px] font-bold flex items-center justify-center transition-all ${bgClass}`}>{day}</button>);
           })}
         </div>
         <div className="mt-4 pt-4 border-t border-white/10 flex justify-between gap-2">
             <button onClick={() => {setStart(''); setEnd('');}} className="px-3 py-2 text-sm font-bold text-slate-400 hover:text-white transition-colors">Effacer</button>
-            <button onClick={close} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-bold rounded-lg transition-colors border border-white/5">Appliquer</button>
+            <button onClick={close} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-lg transition-colors border border-blue-500/50 flex-1 ml-2 text-center">Appliquer</button>
         </div>
       </div>
     );
   };
 
   const StatCard = ({ period, title, value, details, isWinner, icon: Icon, onClickInfo }: any) => {
-    
       const color = period === 'A' ? 'blue' : 'purple';
-      const baseClasses = "bg-white/[.02] border p-4 rounded-xl transition-all duration-300 relative group cursor-pointer";
-      const winnerClasses = `border-${color}-500/50 shadow-lg shadow-${color}-500/5`;
+      const baseClasses = "bg-[#0A0F1C] border p-5 rounded-2xl transition-all duration-300 relative group cursor-pointer hover:scale-[1.02]";
+      const winnerClasses = `border-${color}-500/40 shadow-lg shadow-${color}-500/10`;
       const normalClasses = "border-white/5 hover:border-white/20";
 
       return (
           <div className={`${baseClasses} ${isWinner ? winnerClasses : normalClasses}`} onClick={onClickInfo}>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-2">
-                      <Icon className={`w-4 h-4 text-slate-400 group-hover:text-white transition-colors`} />
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate-400 group-hover:text-white transition-colors">{title}</p>
+                      <div className={`p-2 rounded-lg bg-${color}-500/10`}><Icon className={`w-4 h-4 text-${color}-400`} /></div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-white transition-colors">{title}</p>
                   </div>
-                  {isWinner ? <Trophy className={`w-4 h-4 text-${color}-400`} /> : <Info className="w-3.5 h-3.5 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                  {isWinner ? <Trophy className={`w-4 h-4 text-${color}-400 drop-shadow-[0_0_8px_rgba(currentColor,0.5)]`} /> : <Info className="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />}
               </div>
-              <p className={`text-3xl font-black text-${color}-400 mt-3`}>{value}</p>
+              <p className={`text-3xl md:text-4xl font-black text-white tracking-tight mt-3 mb-1`}>{value}</p>
               <p className="text-xs text-slate-500 font-medium">{details}</p>
           </div>
       );
@@ -186,7 +182,6 @@ export default function ABTesting() {
         @keyframes appleFadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .animate-apple-fade { animation: appleFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         .fast-spin { animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
-        /* Masquer la scrollbar pour un design plus propre */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
 
@@ -242,7 +237,6 @@ export default function ABTesting() {
           </nav>
         </div>
 
-        {/* AJOUT SAFE AREA */}
         <div className="p-4 border-t border-white/5 mt-auto bg-[#03060D] pb-[max(1rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/[0.02] border border-white/5 cursor-default hover:bg-white/5 transition-colors">
                 <div className="relative flex items-center justify-center w-3 h-3"><span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-20 animate-ping"></span><span className="relative inline-flex rounded-full w-2 h-2 bg-emerald-500"></span></div>
@@ -251,51 +245,52 @@ export default function ABTesting() {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col h-[100dvh] relative overflow-hidden">
-        {/* Mobile Header - AJOUT SAFE AREA TOP */}
-        <div className="md:hidden flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#03060D] z-20 pt-[max(1rem,env(safe-area-inset-top))]">
-          <img src="/logo-lorth.png" alt="LORTH" className="h-6 object-contain" />
-          <button onClick={() => setMobileMenuOpen(true)} className="p-2 -mr-2 bg-white/5 rounded-lg text-slate-300"><Menu className="w-5 h-5" /></button>
+      <main className="flex-1 flex flex-col h-[100dvh] relative overflow-hidden min-w-0">
+        
+        {/* HEADER MOBILE UNIQUEMENT - Bouton à gauche, pas de logo */}
+        <div className="md:hidden flex items-center justify-start px-4 py-4 border-b border-white/5 bg-[#03060D] z-30 pt-[max(1rem,env(safe-area-inset-top))]">
+          <button onClick={() => setMobileMenuOpen(true)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors">
+            <Menu className="w-6 h-6" />
+          </button>
         </div>
 
         {/* Background Glow */}
         <div className="absolute top-0 right-0 w-[50vw] h-[50vh] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none hidden md:block"></div>
         
         {loading ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500">
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500 animate-in fade-in duration-300">
             <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full fast-spin"></div>
             <span className="text-[10px] font-extrabold uppercase tracking-widest">Chargement</span>
           </div>
         ) : (
-          /* AJOUT DU SCROLL SUR LE MAIN (overflow-y-auto) ET DE LA SAFE AREA BOTTOM */
-          <div className="flex-1 overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))]">
-            <div className="flex flex-col w-full max-w-5xl mx-auto animate-apple-fade px-4 md:px-8 gap-6 md:gap-8 pt-6 md:pt-12">
+          <div className="flex-1 overflow-y-auto no-scrollbar pb-[calc(2rem+env(safe-area-inset-bottom))] relative z-10">
+            <div className="flex flex-col w-full max-w-5xl mx-auto animate-apple-fade px-4 md:px-8 pt-6 md:pt-10">
                 
-                <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-3"><Beaker className="w-7 h-7 md:w-8 md:h-8 text-blue-500" /> A/B Testing</h1>
-                    <p className="text-slate-400 text-xs md:text-[13px] font-medium mt-1">Comparez l'efficacité de deux périodes d'acquisition.</p>
-                </div>
-                <button onClick={loadData} className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors shadow-sm">
-                    <RefreshCcw className="w-4 h-4 text-slate-300" />
-                </button>
+                {/* Header Aligné horizontalement - Espace en dessous augmenté */}
+                <header className="flex items-start justify-between w-full mb-8 md:mb-12 gap-4">
+                  <div>
+                      <h1 className="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-3 tracking-tight"><Beaker className="w-7 h-7 md:w-8 md:h-8 text-blue-500" /> A/B Testing</h1>
+                      <p className="text-slate-400 text-xs md:text-[13px] font-medium mt-1 md:mt-2">Comparez l'efficacité de deux périodes d'acquisition.</p>
+                  </div>
+                  <button onClick={loadData} className="flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-11 md:h-11 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all shadow-lg hover:shadow-white/5">
+                      <RefreshCcw className="w-4 h-4 md:w-5 md:h-5 text-slate-300" />
+                  </button>
                 </header>
 
-                <div className="bg-[#0A0F1C]/50 border border-white/5 rounded-2xl shadow-2xl grid md:grid-cols-2 overflow-hidden">
+                <div className="bg-[#0A0F1C]/80 border border-white/5 rounded-3xl shadow-2xl grid lg:grid-cols-2 overflow-hidden mb-8">
                     {/* --- COLUMN A --- */}
-                    <div className="p-5 lg:p-8 border-b md:border-b-0 md:border-r border-white/5 bg-blue-500/5 relative">
-                        <h3 className="text-sm font-extrabold text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span> Période A
+                    <div className="p-5 lg:p-8 border-b lg:border-b-0 lg:border-r border-white/5 bg-gradient-to-br from-blue-500/5 to-transparent relative">
+                        <h3 className="text-sm font-extrabold text-blue-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span> Période A
                         </h3>
-                        <div className="relative mb-6">
-                            <button onClick={() => {setShowPickerA(!showPickerA); setShowPickerB(false);}} className="w-full flex items-center justify-between gap-3 bg-white/5 hover:bg-white/10 text-white rounded-lg px-4 py-3.5 text-sm md:text-base font-bold transition-all border border-white/10 focus:border-blue-400 shadow-sm">
-                                <div className="flex items-center gap-3"><CalendarDays className="w-5 h-5 text-blue-400" /> {startA && endA ? `Du ${formatDisplayDate(startA)} au ${formatDisplayDate(endA)}` : 'Sélectionner une période'}</div>
+                        <div className="relative mb-8">
+                            <button onClick={() => {setShowPickerA(!showPickerA); setShowPickerB(false);}} className="w-full flex items-center justify-between gap-3 bg-white/5 hover:bg-white/10 text-white rounded-xl px-5 py-4 text-sm md:text-base font-bold transition-all border border-white/10 hover:border-blue-500/50 shadow-sm group">
+                                <div className="flex items-center gap-3"><CalendarDays className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" /> {startA && endA ? `Du ${formatDisplayDate(startA)} au ${formatDisplayDate(endA)}` : 'Sélectionner une période'}</div>
                             </button>
-                            {/* Z-INDEX TRÈS ÉLEVÉ POUR PASSER AU DESSUS DE LA COLONNE B SUR MOBILE */}
-                            {showPickerA && (<div className="absolute top-full mt-2 left-0 sm:left-auto sm:right-0 md:left-0 md:right-auto bg-[#0A0F1C] border border-white/10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-[300] animate-in slide-in-from-top-2 origin-top">{renderCalendar(startA, endA, setStartA, setEndA, calViewA, setCalViewA, () => setShowPickerA(false))}</div>)}
+                            {showPickerA && (<div className="absolute top-full mt-3 left-0 sm:left-auto sm:right-0 md:left-0 md:right-auto bg-[#0A0F1C] border border-white/10 rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] z-[300] animate-in slide-in-from-top-2 origin-top">{renderCalendar(startA, endA, setStartA, setEndA, calViewA, setCalViewA, () => setShowPickerA(false))}</div>)}
                         </div>
                         
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-5">
                             <StatCard onClickInfo={() => setStatInfo({title: 'Leads Contactés', description: statDescriptions['Leads Contactés']})} period="A" icon={Users} title="Leads Contactés" value={statsA.total} details={`${statsA.total} prospects contactés`} isWinner={statsA.total > statsB.total} />
                             <StatCard onClickInfo={() => setStatInfo({title: 'Taux de Réponse', description: statDescriptions['Taux de Réponse']})} period="A" icon={TrendingUp} title="Taux de Réponse" value={`${statsA.replyRate}%`} details={`${statsA.replies} réponses reçues`} isWinner={statsA.replyRate > statsB.replyRate} />
                             <StatCard onClickInfo={() => setStatInfo({title: 'Ratio de Positivité', description: statDescriptions['Ratio de Positivité']})} period="A" icon={CheckCircle} title="Ratio de Positivité" value={`${statsA.posRate}%`} details={`${statsA.positives} réponses positives`} isWinner={statsA.posRate > statsB.posRate} />
@@ -303,19 +298,18 @@ export default function ABTesting() {
                     </div>
 
                     {/* --- COLUMN B --- */}
-                    <div className="p-5 lg:p-8 bg-purple-500/5 relative">
-                        <h3 className="text-sm font-extrabold text-purple-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span> Période B
+                    <div className="p-5 lg:p-8 bg-gradient-to-br from-purple-500/5 to-transparent relative">
+                        <h3 className="text-sm font-extrabold text-purple-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse shadow-[0_0_10px_rgba(168,85,247,0.5)]"></span> Période B
                         </h3>
-                        <div className="relative mb-6">
-                            <button onClick={() => {setShowPickerB(!showPickerB); setShowPickerA(false);}} className="w-full flex items-center justify-between gap-3 bg-white/5 hover:bg-white/10 text-white rounded-lg px-4 py-3.5 text-sm md:text-base font-bold transition-all border border-white/10 focus:border-purple-400 shadow-sm">
-                                <div className="flex items-center gap-3"><CalendarDays className="w-5 h-5 text-purple-400" /> {startB && endB ? `Du ${formatDisplayDate(startB)} au ${formatDisplayDate(endB)}` : 'Sélectionner une période'}</div>
+                        <div className="relative mb-8">
+                            <button onClick={() => {setShowPickerB(!showPickerB); setShowPickerA(false);}} className="w-full flex items-center justify-between gap-3 bg-white/5 hover:bg-white/10 text-white rounded-xl px-5 py-4 text-sm md:text-base font-bold transition-all border border-white/10 hover:border-purple-500/50 shadow-sm group">
+                                <div className="flex items-center gap-3"><CalendarDays className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" /> {startB && endB ? `Du ${formatDisplayDate(startB)} au ${formatDisplayDate(endB)}` : 'Sélectionner une période'}</div>
                             </button>
-                            {/* Z-INDEX TRÈS ÉLEVÉ */}
-                            {showPickerB && (<div className="absolute top-full mt-2 left-0 sm:left-auto sm:right-0 bg-[#0A0F1C] border border-white/10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-[300] animate-in slide-in-from-top-2 origin-top">{renderCalendar(startB, endB, setStartB, setEndB, calViewB, setCalViewB, () => setShowPickerB(false))}</div>)}
+                            {showPickerB && (<div className="absolute top-full mt-3 left-0 sm:left-auto sm:right-0 bg-[#0A0F1C] border border-white/10 rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.8)] z-[300] animate-in slide-in-from-top-2 origin-top">{renderCalendar(startB, endB, setStartB, setEndB, calViewB, setCalViewB, () => setShowPickerB(false))}</div>)}
                         </div>
 
-                        <div className="space-y-3 md:space-y-4">
+                        <div className="space-y-4 md:space-y-5">
                             <StatCard onClickInfo={() => setStatInfo({title: 'Leads Contactés', description: statDescriptions['Leads Contactés']})} period="B" icon={Users} title="Leads Contactés" value={statsB.total} details={`${statsB.total} prospects contactés`} isWinner={statsB.total > statsA.total} />
                             <StatCard onClickInfo={() => setStatInfo({title: 'Taux de Réponse', description: statDescriptions['Taux de Réponse']})} period="B" icon={TrendingUp} title="Taux de Réponse" value={`${statsB.replyRate}%`} details={`${statsB.replies} réponses reçues`} isWinner={statsB.replyRate > statsA.replyRate} />
                             <StatCard onClickInfo={() => setStatInfo({title: 'Ratio de Positivité', description: statDescriptions['Ratio de Positivité']})} period="B" icon={CheckCircle} title="Ratio de Positivité" value={`${statsB.posRate}%`} details={`${statsB.positives} réponses positives`} isWinner={statsB.posRate > statsA.posRate} />

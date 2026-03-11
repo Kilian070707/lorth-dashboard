@@ -600,244 +600,246 @@ function MailboxContent() {
 
       </aside>
 
-      {/* HEADER MOBILE AJUSTÉ POUR SAFE AREA */}
-      <div className={`md:hidden items-center justify-between px-4 py-3 border-b border-white/5 bg-[#03060D] z-20 pt-[max(1rem,env(safe-area-inset-top))] ${isMobileChatOpen ? 'hidden' : 'flex'}`}>
-        <img src="/logo-lorth.png" alt="LORTH" className="h-6 object-contain" />
-        <button onClick={() => setMobileMenuOpen(true)} className="p-1.5 bg-white/5 rounded-lg text-slate-300">
-          <Menu className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* ZONE CENTRALE (LISTE + CHAT) */}
-      <div className="flex-1 flex h-[100dvh] overflow-hidden relative">
+      {/* ZONE CENTRALE (LISTE + CHAT) englobée dans un <main> pour correspondre aux autres pages */}
+      <main className="flex-1 flex flex-col h-[100dvh] relative overflow-hidden min-w-0">
         
-        {loading && (
-          <div className="absolute inset-0 z-[200] flex items-center justify-center bg-[#020408]/70 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full fast-spin"></div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Chargement</span>
-            </div>
-          </div>
-        )}
-
-        {/* LISTE DES LEADS */}
-        <div className={`w-full md:w-1/3 md:max-w-[360px] border-r border-white/5 bg-[#050811] flex-col overflow-hidden z-10 relative ${isMobileChatOpen ? 'hidden md:flex' : 'flex'}`}>
-          
-          <div className="p-4 border-b border-white/5 bg-[#03060D]/50 relative">
-            <button onClick={() => setShowCentralMenu(!showCentralMenu)} className="w-full flex items-center justify-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 transition-colors group cursor-pointer">
-              <span className="text-[13px] font-extrabold text-white uppercase tracking-wider">{getViewTitle()}</span>
-              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors ${currentView === 'urgent' && !searchQuery ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-300'}`}>{displayLeads.length}</span>
-              {searchQuery === '' && <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-300 ${showCentralMenu ? 'rotate-180' : ''}`} />}
-            </button>
-            
-            {showCentralMenu && searchQuery === '' && (
-                <div className="absolute top-full left-4 right-4 mt-2 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
-                  <button onClick={() => {setCurrentView('all'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-white hover:bg-white/5 flex items-center gap-2">
-                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg> Boîte Globale
-                  </button>
-                  <button onClick={() => {setCurrentView('urgent'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-white hover:bg-white/5 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3B82F6]"></span> Action Requise
-                  </button>
-                  <div className="h-px bg-white/5 my-1"></div>
-                  <button onClick={() => {setCurrentView('favoris'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-2">
-                    <span className="text-yellow-500/80">★</span> Favoris
-                  </button>
-                  {customFolders.map(f => (
-                    <button key={f} onClick={() => {setCurrentView(f); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-2">
-                      <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> {f}
-                    </button>
-                  ))}
-                  <div className="h-px bg-white/5 my-1"></div>
-                  <button onClick={() => {setCurrentView('archives'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/5 flex items-center gap-2">
-                    <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg> Archives
-                  </button>
-                </div>
-            )}
-          </div>
-
-          {uniqueStatusesInView.length > 0 && !selectedIds.length && (
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#050811] relative">
-              <button onClick={() => setStatusFilter(null)} className={`whitespace-nowrap px-3 py-1.5 rounded-md text-[11px] font-extrabold tracking-wider transition-colors border ${!statusFilter ? 'bg-white/10 text-white border-white/20' : 'bg-transparent text-slate-500 border-transparent hover:bg-white/5 hover:text-slate-300'}`}>TOUS</button>
-
-              <div className="relative">
-                <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-extrabold tracking-wider transition-all border ${statusFilter ? `${getStatusColor(statusFilter).bg} ${getStatusColor(statusFilter).text} ${getStatusColor(statusFilter).border}` : 'bg-transparent text-slate-500 border-transparent hover:bg-white/5 hover:text-slate-300'}`}>
-                  <Filter className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{statusFilter ? getVisualStatusName(statusFilter) : 'FILTRER'}</span>
-                  <ChevronDown className="w-3 h-3" />
-                </button>
-
-                {showFilterDropdown && (
-                  <div className="absolute top-full left-0 mt-1 w-56 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
-                    <div className="px-3 py-2 border-b border-white/5">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Filtrer par statut</p>
-                    </div>
-                    {uniqueStatusesInView.map(status => {
-                      const colorTheme = getStatusColor(status);
-                      const isActive = statusFilter === status;
-                      return (
-                        <button key={status} onClick={() => { setStatusFilter(isActive ? null : status); setShowFilterDropdown(false); }} className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-colors flex items-center gap-3 ${isActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5'}`}>
-                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${colorTheme.dot}`}></span>
-                          <span className="truncate">{getVisualStatusName(status)}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {selectedIds.length > 0 && (
-            <div className="absolute top-0 left-0 w-full px-4 py-3 bg-[#0A0F1C]/95 backdrop-blur-md border-b border-white/10 z-20 flex justify-between items-center animate-in slide-in-from-top-2 shadow-2xl pt-[max(1rem,env(safe-area-inset-top))]">
-              <span className="text-xs font-bold text-white">{selectedIds.length} sélectionné(s)</span>
-              <div className="flex gap-2 relative">
-                <button onClick={() => setShowFolderMenu(!showFolderMenu)} className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-xs font-bold text-slate-300 transition-colors">Classer</button>
-                {currentView === 'archives' ? (
-                  <button onClick={() => actionSelected('restore')} className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-xs font-bold text-emerald-400 transition-colors">Désarchiver</button>
-                ) : (
-                  <button onClick={() => actionSelected('archive')} className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-lg text-xs font-bold text-rose-400 transition-colors">Archiver</button>
-                )}
-                {showFolderMenu && (
-                  <div className="absolute top-full mt-2 right-0 bg-[#0A0F1C] border border-white/10 rounded-lg shadow-xl overflow-hidden py-1 w-40 max-h-48 overflow-y-auto">
-                    <button onClick={() => actionSelected('folder', 'Favoris')} className="w-full text-left flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-white/5 truncate"><span className="text-yellow-500/80">★</span> Favoris</button>
-                    {customFolders.map(folder => (
-                      <button key={folder} onClick={() => actionSelected('folder', folder)} className="w-full text-left flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-white/5 truncate"><svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>{folder}</button>
-                    ))}
-                    <div className="h-px bg-white/5 my-1"></div>
-                    <button onClick={() => actionSelected('folder', '')} className="w-full text-left px-4 py-2 text-xs hover:bg-white/5 text-slate-400">Retirer du dossier</button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="overflow-y-auto flex-1 p-2 space-y-1 mt-[2px] pb-[max(1rem,env(safe-area-inset-bottom))]" onClick={() => setShowFilterDropdown(false)}>
-            {displayLeads.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm font-medium animate-in fade-in duration-300">
-                {searchQuery ? "Aucun résultat." : "Rien à afficher."}
-              </div>
-            ) : (
-              displayLeads.map(lead => {
-                const theme = getStatusColor(lead.status);
-                const lastMsg = lead.conversation[lead.conversation.length - 1]; 
-                const isSelected = selectedIds.includes(lead.id);
-
-                let timeIndicator = null;
-                if (lastMsg && (lastMsg.timestamp || (lastMsg.id && lastMsg.id.startsWith('msg-local-'))) && actionStatuses.includes(lead.status)) {
-                    const timestamp = lastMsg.timestamp || parseInt(lastMsg.id.split('-')[2], 10);
-                    if (!isNaN(timestamp)) {
-                        const hoursDiff = (Date.now() - timestamp) / (3600 * 1000);
-                        if (hoursDiff > 24) {
-                            timeIndicator = <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" title="Plus de 24h sans réponse"></span>;
-                        } else if (hoursDiff > 12) {
-                            timeIndicator = <span className="w-2 h-2 rounded-full bg-orange-400" title="Plus de 12h sans réponse"></span>;
-                        }
-                    }
-                }
-
-                return (
-                  <div key={lead.id} onClick={() => handleSelectLead(lead)} className={`p-4 rounded-xl cursor-pointer transition-all duration-200 flex gap-3 ${selectedLead?.id === lead.id ? 'bg-blue-600/10 border border-blue-500/20 shadow-sm' : isSelected ? 'bg-white/5 border-white/10' : 'border border-transparent hover:bg-white/[0.03]'}`}>
-                    <div className="pt-0.5" onClick={(e) => toggleSelectLead(lead.id, e)}><div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isSelected ? 'bg-blue-500 border-blue-500' : 'border-slate-600 hover:border-slate-400'}`}>{isSelected && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}</div></div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center mb-1">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                          {timeIndicator}
-                          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${theme.dot}`}></div>
-                          <h3 className={`font-extrabold text-[14px] truncate ${lead.isArchived ? 'text-slate-400 line-through' : 'text-slate-500'}`}>{lead.name}</h3>
-                        </div>
-                        <span className="text-[10px] font-bold text-slate-500 flex-shrink-0">{lastMsg?.date?.split(' à')[0] || "12:00"}</span>
-                      </div>
-                      <p className="text-[11px] font-bold text-slate-400 mb-1.5 truncate">{lead.company}</p>
-                      <p className={`text-[12px] line-clamp-2 leading-relaxed font-medium transition-colors ${selectedLead?.id === lead.id ? 'text-slate-300' : 'text-slate-500 group-hover:text-slate-400'}`}>"{lastMsg?.text || "Aucun message"}"</p>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+        {/* HEADER MOBILE UNIQUEMENT - Bouton à gauche, pas de logo */}
+        <div className={`md:hidden items-center justify-start px-4 py-4 border-b border-white/5 bg-[#03060D] z-30 pt-[max(1rem,env(safe-area-inset-top))] ${isMobileChatOpen ? 'hidden' : 'flex'}`}>
+          <button onClick={() => setMobileMenuOpen(true)} className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors">
+            <Menu className="w-6 h-6" />
+          </button>
         </div>
 
-        {/* ZONE DE DISCUSSION */}
-        {selectedLead ? (
-          <div key={selectedLead.id} className={`flex-1 flex-col relative bg-[#020408] animate-apple-fade ${isMobileChatOpen ? 'flex' : 'hidden md:flex'}`}>
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none hidden md:block"></div>
-
-            <div className="px-4 md:px-8 py-4 md:py-5 border-b border-white/5 flex justify-between items-center bg-[#03060D]/80 backdrop-blur-md z-10 pt-[max(1rem,env(safe-area-inset-top))] md:pt-4">
-              <div className="flex items-center gap-3">
-                <button onClick={handleCloseMobileChat} className="md:hidden p-1.5 bg-white/5 rounded-lg text-slate-300">
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-                <div className="flex flex-col gap-1 md:gap-1.5">
-                  <h2 className="text-lg md:text-xl font-extrabold text-white flex items-center gap-3">
-                    {selectedLead.name}
-                    {selectedLead.folder && <span className="text-[10px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-widest shadow-sm hidden sm:inline-block">{selectedLead.folder}</span>}
-                    <span className="text-slate-500 font-bold text-sm truncate max-w-[150px] md:max-w-sm hidden xl:inline-block">— {selectedLead.subject}</span>
-                  </h2>
-                  <p className="text-[11px] md:text-xs font-bold text-slate-400 flex items-center gap-2 truncate max-w-[200px] md:max-w-none">{selectedLead.company} <span className="w-1 h-1 rounded-full bg-slate-600 hidden sm:inline-block"></span> <span className="hidden sm:inline-block">{selectedLead.email}</span></p>
-                </div>
+        {/* WRAPPER DU CONTENU MAILBOX */}
+        <div className="flex-1 flex overflow-hidden relative">
+          
+          {loading && (
+            <div className="absolute inset-0 z-[200] flex items-center justify-center bg-[#020408]/70 backdrop-blur-md animate-in fade-in duration-200">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full fast-spin"></div>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Chargement</span>
               </div>
+            </div>
+          )}
+
+          {/* LISTE DES LEADS */}
+          <div className={`w-full md:w-1/3 md:max-w-[360px] border-r border-white/5 bg-[#050811] flex-col overflow-hidden z-10 relative ${isMobileChatOpen ? 'hidden md:flex' : 'flex'}`}>
+            
+            <div className="p-4 border-b border-white/5 bg-[#03060D]/50 relative">
+              <button onClick={() => setShowCentralMenu(!showCentralMenu)} className="w-full flex items-center justify-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 transition-colors group cursor-pointer">
+                <span className="text-[13px] font-extrabold text-white uppercase tracking-wider">{getViewTitle()}</span>
+                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors ${currentView === 'urgent' && !searchQuery ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-300'}`}>{displayLeads.length}</span>
+                {searchQuery === '' && <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-300 ${showCentralMenu ? 'rotate-180' : ''}`} />}
+              </button>
               
-              <div className="flex flex-col items-end gap-2 relative">
-                  <button onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)} className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 rounded-full border cursor-pointer hover:brightness-110 transition-all ${getStatusColor(selectedLead.status).bg} ${getStatusColor(selectedLead.status).border}`}>
-                    <div className={`w-2 h-2 rounded-full ${getStatusColor(selectedLead.status).dot}`}></div>
-                    <span className={`text-[9px] md:text-[10px] font-bold uppercase tracking-widest truncate max-w-[80px] sm:max-w-[150px] ${getStatusColor(selectedLead.status).text}`}>{getVisualStatusName(selectedLead.status)}</span>
-                    <ChevronDown className={`w-3 h-3 ${getStatusColor(selectedLead.status).text}`} />
+              {showCentralMenu && searchQuery === '' && (
+                  <div className="absolute top-full left-4 right-4 mt-2 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
+                    <button onClick={() => {setCurrentView('all'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-white hover:bg-white/5 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg Boîte Globale
+                    </button>
+                    <button onClick={() => {setCurrentView('urgent'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-white hover:bg-white/5 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3B82F6]"></span> Action Requise
+                    </button>
+                    <div className="h-px bg-white/5 my-1"></div>
+                    <button onClick={() => {setCurrentView('favoris'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-2">
+                      <span className="text-yellow-500/80">★</span> Favoris
+                    </button>
+                    {customFolders.map(f => (
+                      <button key={f} onClick={() => {setCurrentView(f); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-2">
+                        <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> {f}
+                      </button>
+                    ))}
+                    <div className="h-px bg-white/5 my-1"></div>
+                    <button onClick={() => {setCurrentView('archives'); setShowCentralMenu(false); setSelectedIds([]); setStatusFilter(null);}} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-400 hover:bg-white/5 flex items-center gap-2">
+                      <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg> Archives
+                    </button>
+                  </div>
+              )}
+            </div>
+
+            {uniqueStatusesInView.length > 0 && !selectedIds.length && (
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#050811] relative">
+                <button onClick={() => setStatusFilter(null)} className={`whitespace-nowrap px-3 py-1.5 rounded-md text-[11px] font-extrabold tracking-wider transition-colors border ${!statusFilter ? 'bg-white/10 text-white border-white/20' : 'bg-transparent text-slate-500 border-transparent hover:bg-white/5 hover:text-slate-300'}`}>TOUS</button>
+
+                <div className="relative">
+                  <button onClick={() => setShowFilterDropdown(!showFilterDropdown)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-extrabold tracking-wider transition-all border ${statusFilter ? `${getStatusColor(statusFilter).bg} ${getStatusColor(statusFilter).text} ${getStatusColor(statusFilter).border}` : 'bg-transparent text-slate-500 border-transparent hover:bg-white/5 hover:text-slate-300'}`}>
+                    <Filter className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">{statusFilter ? getVisualStatusName(statusFilter) : 'FILTRER'}</span>
+                    <ChevronDown className="w-3 h-3" />
                   </button>
 
-                  {isStatusMenuOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-56 md:w-64 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
-                      <div className="px-3 py-2 border-b border-white/5"><p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Action Requise</p></div>
-                      <button onClick={() => handleStatusChange('Question à traiter')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34D399]"></span> Réponse - Question</button>
-                      <button onClick={() => handleStatusChange('Objection à traiter')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_#FACC15]"></span> Réponse - Objection</button>
-                      <button onClick={() => handleStatusChange('En conversation')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 shadow-[0_0_8px_#FB923C]"></span> En conversation</button>
-                      <button onClick={() => handleStatusChange('Ghost à relancer')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-slate-300 shadow-[0_0_8px_#cbd5e1]"></span> Ghost à relancer</button>
-                      <button onClick={() => handleStatusChange('Vidéo à tourner')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#C084FC]"></span> Vidéo à tourner</button>
-
-                      <div className="px-3 py-2 border-b border-t border-white/5 mt-1"><p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Terminé / Attente</p></div>
-                      <button onClick={() => handleStatusChange('Objection traitée')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-teal-400 shadow-[0_0_8px_#2DD4BF]"></span> Outreach Successful</button>
-                      <button onClick={() => handleStatusChange('Mail envoyé')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_#60A5FA]"></span> 1er cold outreach</button>
-                      <button onClick={() => handleStatusChange('Désinscrit')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-red-400 shadow-[0_0_8px_#F87171]"></span> Désinscrit</button>
+                  {showFilterDropdown && (
+                    <div className="absolute top-full left-0 mt-1 w-56 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
+                      <div className="px-3 py-2 border-b border-white/5">
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Filtrer par statut</p>
+                      </div>
+                      {uniqueStatusesInView.map(status => {
+                        const colorTheme = getStatusColor(status);
+                        const isActive = statusFilter === status;
+                        return (
+                          <button key={status} onClick={() => { setStatusFilter(isActive ? null : status); setShowFilterDropdown(false); }} className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-colors flex items-center gap-3 ${isActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5'}`}>
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${colorTheme.dot}`}></span>
+                            <span className="truncate">{getVisualStatusName(status)}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
-
-                  <p className="text-[9px] md:text-[10px] font-bold text-slate-500 hidden sm:block">Boîte: {selectedLead.sender}</p>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6 md:space-y-8 scroll-smooth flex flex-col" onClick={() => setIsStatusMenuOpen(false)}>
-              {selectedLead.conversation.map((msg: any, index: number) => (
-                <div key={msg.id} className={`flex flex-col max-w-[90%] md:max-w-[80%] ${index > 0 ? 'animate-apple-fade-delay' : ''} ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                  <div className="flex items-center gap-2 mb-1.5 px-1"><span className="text-[11px] font-bold text-slate-400">{msg.senderName}</span><span className="text-[10px] font-bold text-slate-600">{msg.date}</span></div>
-                  <div className={`p-4 md:p-5 text-[13px] md:text-[14px] leading-relaxed shadow-lg ${msg.isMe ? 'bg-blue-600/15 border border-blue-500/20 text-slate-100 rounded-2xl rounded-tr-sm' : 'bg-white/[0.04] border border-white/10 text-slate-200 rounded-2xl rounded-tl-sm'}`}><p className="whitespace-pre-wrap font-medium">{msg.text}</p></div>
+            {selectedIds.length > 0 && (
+              <div className="absolute top-0 left-0 w-full px-4 py-3 bg-[#0A0F1C]/95 backdrop-blur-md border-b border-white/10 z-20 flex justify-between items-center animate-in slide-in-from-top-2 shadow-2xl pt-[max(1rem,env(safe-area-inset-top))]">
+                <span className="text-xs font-bold text-white">{selectedIds.length} sélectionné(s)</span>
+                <div className="flex gap-2 relative">
+                  <button onClick={() => setShowFolderMenu(!showFolderMenu)} className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-xs font-bold text-slate-300 transition-colors">Classer</button>
+                  {currentView === 'archives' ? (
+                    <button onClick={() => actionSelected('restore')} className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-lg text-xs font-bold text-emerald-400 transition-colors">Désarchiver</button>
+                  ) : (
+                    <button onClick={() => actionSelected('archive')} className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-lg text-xs font-bold text-rose-400 transition-colors">Archiver</button>
+                  )}
+                  {showFolderMenu && (
+                    <div className="absolute top-full mt-2 right-0 bg-[#0A0F1C] border border-white/10 rounded-lg shadow-xl overflow-hidden py-1 w-40 max-h-48 overflow-y-auto">
+                      <button onClick={() => actionSelected('folder', 'Favoris')} className="w-full text-left flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-white/5 truncate"><span className="text-yellow-500/80">★</span> Favoris</button>
+                      {customFolders.map(folder => (
+                        <button key={folder} onClick={() => actionSelected('folder', folder)} className="w-full text-left flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-white/5 truncate"><svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>{folder}</button>
+                      ))}
+                      <div className="h-px bg-white/5 my-1"></div>
+                      <button onClick={() => actionSelected('folder', '')} className="w-full text-left px-4 py-2 text-xs hover:bg-white/5 text-slate-400">Retirer du dossier</button>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
-            <div className="p-4 md:p-6 pt-2 bg-gradient-to-t from-[#020408] to-transparent z-10 pb-[calc(1rem+env(safe-area-inset-bottom))]" onClick={() => setIsStatusMenuOpen(false)}>
-              {isAiDraft && (
-                <div className="flex items-center gap-2 text-xs text-purple-400 font-bold mb-2 px-2">
-                  <Bot className="w-4 h-4" />
-                  <span>Brouillon généré par IA</span>
+            <div className="overflow-y-auto flex-1 p-2 space-y-1 mt-[2px] pb-[max(1rem,env(safe-area-inset-bottom))]" onClick={() => setShowFilterDropdown(false)}>
+              {displayLeads.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm font-medium animate-in fade-in duration-300">
+                  {searchQuery ? "Aucun résultat." : "Rien à afficher."}
                 </div>
+              ) : (
+                displayLeads.map(lead => {
+                  const theme = getStatusColor(lead.status);
+                  const lastMsg = lead.conversation[lead.conversation.length - 1]; 
+                  const isSelected = selectedIds.includes(lead.id);
+
+                  let timeIndicator = null;
+                  if (lastMsg && (lastMsg.timestamp || (lastMsg.id && lastMsg.id.startsWith('msg-local-'))) && actionStatuses.includes(lead.status)) {
+                      const timestamp = lastMsg.timestamp || parseInt(lastMsg.id.split('-')[2], 10);
+                      if (!isNaN(timestamp)) {
+                          const hoursDiff = (Date.now() - timestamp) / (3600 * 1000);
+                          if (hoursDiff > 24) {
+                              timeIndicator = <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" title="Plus de 24h sans réponse"></span>;
+                          } else if (hoursDiff > 12) {
+                              timeIndicator = <span className="w-2 h-2 rounded-full bg-orange-400" title="Plus de 12h sans réponse"></span>;
+                          }
+                      }
+                  }
+
+                  return (
+                    <div key={lead.id} onClick={() => handleSelectLead(lead)} className={`p-4 rounded-xl cursor-pointer transition-all duration-200 flex gap-3 ${selectedLead?.id === lead.id ? 'bg-blue-600/10 border border-blue-500/20 shadow-sm' : isSelected ? 'bg-white/5 border-white/10' : 'border border-transparent hover:bg-white/[0.03]'}`}>
+                      <div className="pt-0.5" onClick={(e) => toggleSelectLead(lead.id, e)}><div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isSelected ? 'bg-blue-500 border-blue-500' : 'border-slate-600 hover:border-slate-400'}`}>{isSelected && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}</div></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center mb-1">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            {timeIndicator}
+                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${theme.dot}`}></div>
+                            <h3 className={`font-extrabold text-[14px] truncate ${lead.isArchived ? 'text-slate-400 line-through' : 'text-slate-500'}`}>{lead.name}</h3>
+                          </div>
+                          <span className="text-[10px] font-bold text-slate-500 flex-shrink-0">{lastMsg?.date?.split(' à')[0] || "12:00"}</span>
+                        </div>
+                        <p className="text-[11px] font-bold text-slate-400 mb-1.5 truncate">{lead.company}</p>
+                        <p className={`text-[12px] line-clamp-2 leading-relaxed font-medium transition-colors ${selectedLead?.id === lead.id ? 'text-slate-300' : 'text-slate-500 group-hover:text-slate-400'}`}>"{lastMsg?.text || "Aucun message"}"</p>
+                      </div>
+                    </div>
+                  );
+                })
               )}
-              <div className="bg-[#0A0F1C] border border-white/10 rounded-xl focus-within:border-blue-500/40 focus-within:bg-white/[0.02] transition-all flex flex-col shadow-2xl">
-                <div className="flex items-center gap-1 px-3 py-2 border-b border-white/5"><button className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded transition-colors font-bold">B</button><button className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded transition-colors italic">I</button><div className="w-px h-4 bg-white/10 mx-1"></div><button className="px-2 py-1 text-slate-400 hover:text-white hover:bg-white/10 rounded transition-colors flex items-center gap-1.5"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg><span className="text-[10px] font-extrabold tracking-wider hidden sm:inline">JOINDRE</span></button></div>
-                <textarea ref={textareaRef} value={replyText} onChange={handleTextareaChange} onKeyDown={handleKeyDown} placeholder="Écrivez votre message..." className="w-full bg-transparent px-4 py-3 text-[14px] font-medium text-slate-100 resize-none outline-none overflow-y-auto leading-relaxed" style={{ minHeight: '48px', maxHeight: '250px' }} rows={1} />
-                <div className="px-4 py-2.5 flex justify-between items-center bg-black/20 rounded-b-xl">
-                  <div className="text-[10px] font-bold text-slate-500 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"><span><kbd className="bg-white/10 px-1.5 py-0.5 rounded text-slate-300 font-sans shadow-sm mr-1 hidden sm:inline-block">Entrée</kbd> <span className="sm:hidden">Envoyer</span></span></div>
-                  <button onClick={() => setShowConfirmSend(true)} disabled={!replyText.trim()} className="bg-blue-600 hover:bg-blue-500 disabled:bg-white/5 disabled:text-slate-600 text-white text-xs font-extrabold py-2 px-4 rounded-md transition-all flex items-center gap-2 shadow-[0_0_10px_rgba(37,99,235,0.2)]">Envoyer<Send className="w-3.5 h-3.5" /></button>
+            </div>
+          </div>
+
+          {/* ZONE DE DISCUSSION */}
+          {selectedLead ? (
+            <div key={selectedLead.id} className={`flex-1 flex-col relative bg-[#020408] animate-apple-fade ${isMobileChatOpen ? 'flex' : 'hidden md:flex'}`}>
+              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none hidden md:block"></div>
+
+              <div className="px-4 md:px-8 py-4 md:py-5 border-b border-white/5 flex justify-between items-center bg-[#03060D]/80 backdrop-blur-md z-10 pt-[max(1rem,env(safe-area-inset-top))] md:pt-4">
+                <div className="flex items-center gap-3">
+                  <button onClick={handleCloseMobileChat} className="md:hidden p-1.5 bg-white/5 rounded-lg text-slate-300">
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
+                  <div className="flex flex-col gap-1 md:gap-1.5">
+                    <h2 className="text-lg md:text-xl font-extrabold text-white flex items-center gap-3">
+                      {selectedLead.name}
+                      {selectedLead.folder && <span className="text-[10px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-widest shadow-sm hidden sm:inline-block">{selectedLead.folder}</span>}
+                      <span className="text-slate-500 font-bold text-sm truncate max-w-[150px] md:max-w-sm hidden xl:inline-block">— {selectedLead.subject}</span>
+                    </h2>
+                    <p className="text-[11px] md:text-xs font-bold text-slate-400 flex items-center gap-2 truncate max-w-[200px] md:max-w-none">{selectedLead.company} <span className="w-1 h-1 rounded-full bg-slate-600 hidden sm:inline-block"></span> <span className="hidden sm:inline-block">{selectedLead.email}</span></p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-end gap-2 relative">
+                    <button onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)} className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 rounded-full border cursor-pointer hover:brightness-110 transition-all ${getStatusColor(selectedLead.status).bg} ${getStatusColor(selectedLead.status).border}`}>
+                      <div className={`w-2 h-2 rounded-full ${getStatusColor(selectedLead.status).dot}`}></div>
+                      <span className={`text-[9px] md:text-[10px] font-bold uppercase tracking-widest truncate max-w-[80px] sm:max-w-[150px] ${getStatusColor(selectedLead.status).text}`}>{getVisualStatusName(selectedLead.status)}</span>
+                      <ChevronDown className={`w-3 h-3 ${getStatusColor(selectedLead.status).text}`} />
+                    </button>
+
+                    {isStatusMenuOpen && (
+                      <div className="absolute top-full right-0 mt-2 w-56 md:w-64 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
+                        <div className="px-3 py-2 border-b border-white/5"><p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Action Requise</p></div>
+                        <button onClick={() => handleStatusChange('Question à traiter')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34D399]"></span> Réponse - Question</button>
+                        <button onClick={() => handleStatusChange('Objection à traiter')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_#FACC15]"></span> Réponse - Objection</button>
+                        <button onClick={() => handleStatusChange('En conversation')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-orange-400 shadow-[0_0_8px_#FB923C]"></span> En conversation</button>
+                        <button onClick={() => handleStatusChange('Ghost à relancer')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-slate-300 shadow-[0_0_8px_#cbd5e1]"></span> Ghost à relancer</button>
+                        <button onClick={() => handleStatusChange('Vidéo à tourner')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#C084FC]"></span> Vidéo à tourner</button>
+
+                        <div className="px-3 py-2 border-b border-t border-white/5 mt-1"><p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Terminé / Attente</p></div>
+                        <button onClick={() => handleStatusChange('Objection traitée')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-teal-400 shadow-[0_0_8px_#2DD4BF]"></span> Outreach Successful</button>
+                        <button onClick={() => handleStatusChange('Mail envoyé')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_#60A5FA]"></span> 1er cold outreach</button>
+                        <button onClick={() => handleStatusChange('Désinscrit')} className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 flex items-center gap-3"><span className="w-2 h-2 rounded-full bg-red-400 shadow-[0_0_8px_#F87171]"></span> Désinscrit</button>
+                      </div>
+                    )}
+
+                    <p className="text-[9px] md:text-[10px] font-bold text-slate-500 hidden sm:block">Boîte: {selectedLead.sender}</p>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6 md:space-y-8 scroll-smooth flex flex-col" onClick={() => setIsStatusMenuOpen(false)}>
+                {selectedLead.conversation.map((msg: any, index: number) => (
+                  <div key={msg.id} className={`flex flex-col max-w-[90%] md:max-w-[80%] ${index > 0 ? 'animate-apple-fade-delay' : ''} ${msg.isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
+                    <div className="flex items-center gap-2 mb-1.5 px-1"><span className="text-[11px] font-bold text-slate-400">{msg.senderName}</span><span className="text-[10px] font-bold text-slate-600">{msg.date}</span></div>
+                    <div className={`p-4 md:p-5 text-[13px] md:text-[14px] leading-relaxed shadow-lg ${msg.isMe ? 'bg-blue-600/15 border border-blue-500/20 text-slate-100 rounded-2xl rounded-tr-sm' : 'bg-white/[0.04] border border-white/10 text-slate-200 rounded-2xl rounded-tl-sm'}`}><p className="whitespace-pre-wrap font-medium">{msg.text}</p></div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 md:p-6 pt-2 bg-gradient-to-t from-[#020408] to-transparent z-10 pb-[calc(1rem+env(safe-area-inset-bottom))]" onClick={() => setIsStatusMenuOpen(false)}>
+                {isAiDraft && (
+                  <div className="flex items-center gap-2 text-xs text-purple-400 font-bold mb-2 px-2">
+                    <Bot className="w-4 h-4" />
+                    <span>Brouillon généré par IA</span>
+                  </div>
+                )}
+                <div className="bg-[#0A0F1C] border border-white/10 rounded-xl focus-within:border-blue-500/40 focus-within:bg-white/[0.02] transition-all flex flex-col shadow-2xl">
+                  <div className="flex items-center gap-1 px-3 py-2 border-b border-white/5"><button className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded transition-colors font-bold">B</button><button className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded transition-colors italic">I</button><div className="w-px h-4 bg-white/10 mx-1"></div><button className="px-2 py-1 text-slate-400 hover:text-white hover:bg-white/10 rounded transition-colors flex items-center gap-1.5"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg><span className="text-[10px] font-extrabold tracking-wider hidden sm:inline">JOINDRE</span></button></div>
+                  <textarea ref={textareaRef} value={replyText} onChange={handleTextareaChange} onKeyDown={handleKeyDown} placeholder="Écrivez votre message..." className="w-full bg-transparent px-4 py-3 text-[14px] font-medium text-slate-100 resize-none outline-none overflow-y-auto leading-relaxed" style={{ minHeight: '48px', maxHeight: '250px' }} rows={1} />
+                  <div className="px-4 py-2.5 flex justify-between items-center bg-black/20 rounded-b-xl">
+                    <div className="text-[10px] font-bold text-slate-500 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"><span><kbd className="bg-white/10 px-1.5 py-0.5 rounded text-slate-300 font-sans shadow-sm mr-1 hidden sm:inline-block">Entrée</kbd> <span className="sm:hidden">Envoyer</span></span></div>
+                    <button onClick={() => setShowConfirmSend(true)} disabled={!replyText.trim()} className="bg-blue-600 hover:bg-blue-500 disabled:bg-white/5 disabled:text-slate-600 text-white text-xs font-extrabold py-2 px-4 rounded-md transition-all flex items-center gap-2 shadow-[0_0_10px_rgba(37,99,235,0.2)]">Envoyer<Send className="w-3.5 h-3.5" /></button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <div className="flex-1 flex-col items-center justify-center text-slate-600 text-sm bg-[#020408] font-bold animate-apple-fade hidden md:flex">
-            <div className="w-16 h-16 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center mb-4"><MessageSquare className="w-6 h-6 text-slate-700" /></div>
-            Aucune conversation sélectionnée.
-          </div>
-        )}
-      </div>
-
+          ) : (
+            <div className="flex-1 flex-col items-center justify-center text-slate-600 text-sm bg-[#020408] font-bold animate-apple-fade hidden md:flex">
+              <div className="w-16 h-16 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center mb-4"><MessageSquare className="w-6 h-6 text-slate-700" /></div>
+              Aucune conversation sélectionnée.
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
