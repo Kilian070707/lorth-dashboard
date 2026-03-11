@@ -152,7 +152,7 @@ export default function ABTesting() {
     );
   };
 
-  const StatCard = ({ period, title, value, details, isWinner, icon: Icon, onClickInfo }) => {
+  const StatCard = ({ period, title, value, details, isWinner, icon: Icon, onClickInfo }: any) => {
       const color = period === 'A' ? 'blue' : 'purple';
       const baseClasses = "bg-white/[.02] border p-4 rounded-xl transition-all duration-300 relative group cursor-pointer";
       const winnerClasses = `border-${color}-500/50 shadow-lg shadow-${color}-500/5`;
