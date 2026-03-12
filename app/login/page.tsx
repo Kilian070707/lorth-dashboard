@@ -58,7 +58,7 @@ export default function LoginPage() {
           <img 
             src="/logo-lorth.svg" 
             alt="LORTH" 
-            className="w-32 md:w-40 h-auto object-contain" 
+            className="w-28 md:w-38 h-auto object-contain" 
           />
         </div>
 

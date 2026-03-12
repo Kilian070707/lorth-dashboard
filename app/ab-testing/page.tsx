@@ -218,7 +218,7 @@ export default function ABTesting() {
         <button onClick={() => setMobileMenuOpen(false)} className="md:hidden absolute top-6 right-4 p-2 text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
         <div className="py-10 flex justify-center items-center">
           <button onClick={handleLogout} className="p-2 touch-manipulation active:scale-95 transition-transform outline-none group">
-            <img src="/logo-lorth.svg" alt="LORTH" className="w-24 md:w-32 h-auto object-contain group-hover:opacity-80" />
+            <img src="/logo-lorth.svg" alt="LORTH" className="w-28 md:w-38 h-auto object-contain group-hover:opacity-80" />
           </button>
         </div>
         

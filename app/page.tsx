@@ -351,9 +351,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-[100dvh] bg-[#020408] text-slate-100 font-sans antialiased overflow-hidden relative">
-      
-      {/* ÉCRAN NOIR DE LANCEMENT (FADE OUT) */}
-      <div className={`fixed inset-0 bg-black z-[9999] pointer-events-none transition-opacity duration-300 ease-in-out ${mounted ? 'opacity-0' : 'opacity-100'}`}></div>
 
       <style>{`
         @keyframes appleFadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -393,7 +390,7 @@ export default function Dashboard() {
 
         <div className="py-10 flex justify-center items-center">
           <button onClick={handleLogout} className="p-2 touch-manipulation active:scale-95 transition-transform outline-none group">
-            <img src="/logo-lorth.svg" alt="LORTH" className="w-24 md:w-32 h-auto object-contain group-hover:opacity-80" />
+            <img src="/logo-lorth.svg" alt="LORTH" className="w-28 md:w-38 h-auto object-contain group-hover:opacity-100" />
           </button>
         </div>
         
@@ -488,7 +485,7 @@ export default function Dashboard() {
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none md:hidden"></div>
         
         {loading ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500 animate-in fade-in duration-300">
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500">
              <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full fast-spin"></div>
              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500"><span>Chargement</span></span>
           </div>
