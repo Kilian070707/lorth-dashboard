@@ -7,6 +7,12 @@ function MailboxContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const handleLogout = async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  };
+
   const [allLeads, setAllLeads] = useState<any[]>([]);
   const [selectedLead, setSelectedLead] = useState<any>(null);
   const [replyText, setReplyText] = useState("");
@@ -493,8 +499,10 @@ function MailboxContent() {
           <X className="w-6 h-6" />
         </button>
 
-        <div className="py-6 flex justify-center items-center">
-          <img src="/logo-lorth.svg" alt="LORTH" className="w-44 md:w-52 h-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
+        <div className="py-10 flex justify-center items-center">
+          <button onClick={handleLogout} className="p-2 touch-manipulation active:scale-95 transition-transform outline-none group">
+            <img src="/logo-lorth.svg" alt="LORTH" className="w-24 md:w-32 h-auto object-contain group-hover:opacity-80" />
+          </button>
         </div>
         
         <div className="px-4 mb-6">
@@ -835,7 +843,6 @@ function MailboxContent() {
     </div>
   );
 }
-
 
 export default function Mailbox() {
   return (

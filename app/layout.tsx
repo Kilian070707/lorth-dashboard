@@ -21,7 +21,7 @@ export const viewport: Viewport = {
   userScalable: false, // Empêche le zoom sur les inputs iOS
 };
 
-// 2. Mise à jour des métadonnées et connexion avec iOS
+// 2. Mise à jour des métadonnées avec ton nouveau favicon SVG
 export const metadata: Metadata = {
   title: "LORTH Command Center",
   description: "Système d'acquisition et Mailbox LORTH",
@@ -32,9 +32,14 @@ export const metadata: Metadata = {
     title: "LORTH",
   },
   icons: {
-    icon: "/apple-touch-icon.png", // Utilise ton nouveau logo pour l'onglet du navigateur
-    shortcut: "/apple-touch-icon.png",
-    apple: "/apple-touch-icon.png", // Utilise le fichier que tu as dans public pour l'iPhone
+    icon: [
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/apple-touch-icon.png", // On garde le PNG ici car iOS ne supporte pas bien le SVG en icône d'accueil
   },
 };
 

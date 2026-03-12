@@ -26,6 +26,12 @@ export default function ABTesting() {
   const [allLeads, setAllLeads] = useState<any[]>([]);
   const [dashSearch, setDashSearch] = useState("");
 
+  const handleLogout = async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  };
+
   // Période A
   const [startA, setStartA] = useState<string>(formatToYMD(defaultAStart));
   const [endA, setEndA] = useState<string>(formatToYMD(defaultAEnd));
@@ -153,7 +159,11 @@ export default function ABTesting() {
       const color = period === 'A' ? 'blue' : 'purple';
       const baseClasses = "bg-[#0A0F1C] border p-5 rounded-2xl transition-all duration-300 relative group cursor-pointer hover:scale-[1.02]";
       const winnerClasses = `border-${color}-500/40 shadow-lg shadow-${color}-500/10`;
-      const normalClasses = "border-white/5 hover:border-white/20";
+      const normalClasses = `border-white/5 hover:border-${color}-500/50`;
+      
+      const trophyGlowClass = color === 'blue' 
+        ? 'drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]' 
+        : 'drop-shadow-[0_0_8px_rgba(192,132,252,0.5)]';
 
       return (
           <div className={`${baseClasses} ${isWinner ? winnerClasses : normalClasses}`} onClick={onClickInfo}>
@@ -162,7 +172,7 @@ export default function ABTesting() {
                       <div className={`p-2 rounded-lg bg-${color}-500/10`}><Icon className={`w-4 h-4 text-${color}-400`} /></div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-white transition-colors"><span>{title}</span></p>
                   </div>
-                  {isWinner ? <Trophy className={`w-4 h-4 text-${color}-400 drop-shadow-[0_0_8px_rgba(currentColor,0.5)]`} /> : <Info className="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                  {isWinner ? <Trophy className={`w-4 h-4 text-${color}-400 ${trophyGlowClass}`} /> : <Info className="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />}
               </div>
               <p className={`text-3xl md:text-4xl font-black text-white tracking-tight mt-3 mb-1`}><span>{value}</span></p>
               <p className="text-xs text-slate-500 font-medium"><span>{details}</span></p>
@@ -179,8 +189,6 @@ export default function ABTesting() {
   return (
     <div className="flex h-[100dvh] bg-[#020408] text-white font-sans antialiased overflow-hidden relative">
       <style>{`
-        @keyframes appleFadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .animate-apple-fade { animation: appleFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .fast-spin { animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
@@ -208,9 +216,11 @@ export default function ABTesting() {
 
       <aside className={`fixed md:relative z-[100] w-64 h-[100dvh] border-r border-white/5 bg-[#03060D] flex flex-col transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
         <button onClick={() => setMobileMenuOpen(false)} className="md:hidden absolute top-6 right-4 p-2 text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
-        <a href="https://lorth-solutions.fr" target="_blank" rel="noopener noreferrer" className="pt-10 pb-8 flex justify-center items-center">
-          <img src="/logo-lorth.svg" alt="LORTH" className="w-36 md:w-44 h-auto object-contain" />
-        </a>
+        <div className="py-10 flex justify-center items-center">
+          <button onClick={handleLogout} className="p-2 touch-manipulation active:scale-95 transition-transform outline-none group">
+            <img src="/logo-lorth.svg" alt="LORTH" className="w-24 md:w-32 h-auto object-contain group-hover:opacity-80" />
+          </button>
+        </div>
         
         <div className="px-4 mb-6">
           <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl focus-within:border-blue-500/50 transition-colors group cursor-text">
@@ -258,7 +268,7 @@ export default function ABTesting() {
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto no-scrollbar pb-[calc(2rem+env(safe-area-inset-bottom))] relative z-10 pt-[max(1rem,env(safe-area-inset-top))] md:pt-0">
-            <div className="flex flex-col w-full max-w-5xl mx-auto animate-apple-fade px-4 md:px-8 pt-4 md:pt-10">
+            <div className="flex flex-col w-full max-w-5xl mx-auto px-4 md:px-8 pt-8 md:pt-14">
                 
                 {/* Header Aligné horizontalement - Bouton menu intégré sur la même ligne */}
                 <header className="flex items-start justify-between w-full mb-8 md:mb-12 gap-4">

@@ -35,6 +35,12 @@ export default function Dashboard() {
   const [statInfo, setStatInfo] = useState<{title: string, description: string} | null>(null);
   const [dashSearch, setDashSearch] = useState("");
 
+  const handleLogout = async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  };
+
   const loadData = async () => {
     setLoading(true);
     try {
@@ -385,8 +391,10 @@ export default function Dashboard() {
           <X className="w-6 h-6" />
         </button>
 
-        <div className="py-6 flex justify-center items-center">
-          <img src="/logo-lorth.svg" alt="LORTH" className="w-44 md:w-52 h-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
+        <div className="py-10 flex justify-center items-center">
+          <button onClick={handleLogout} className="p-2 touch-manipulation active:scale-95 transition-transform outline-none group">
+            <img src="/logo-lorth.svg" alt="LORTH" className="w-24 md:w-32 h-auto object-contain group-hover:opacity-80" />
+          </button>
         </div>
         
         <div className="px-4 mb-6">
@@ -485,7 +493,7 @@ export default function Dashboard() {
              <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500"><span>Chargement</span></span>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col w-full max-w-6xl mx-auto animate-apple-fade px-4 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] md:pt-10 pb-4 relative z-10 min-h-0">
+          <div className="flex-1 flex flex-col w-full max-w-6xl mx-auto px-4 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] md:pt-10 pb-4 relative z-10 min-h-0">
             
             <header className="flex flex-col xl:flex-row xl:justify-between xl:items-end gap-6 mb-8 md:mb-14">
               <div className="flex flex-col">
