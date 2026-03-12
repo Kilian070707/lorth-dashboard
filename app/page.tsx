@@ -353,7 +353,7 @@ export default function Dashboard() {
     <div className="flex h-[100dvh] bg-[#020408] text-slate-100 font-sans antialiased overflow-hidden relative">
       
       {/* ÉCRAN NOIR DE LANCEMENT (FADE OUT) */}
-      <div className={`fixed inset-0 bg-black z-[9999] pointer-events-none transition-opacity duration-1000 ease-in-out ${mounted ? 'opacity-0' : 'opacity-100'}`}></div>
+      <div className={`fixed inset-0 bg-black z-[9999] pointer-events-none transition-opacity duration-300 ease-in-out ${mounted ? 'opacity-0' : 'opacity-100'}`}></div>
 
       <style>{`
         @keyframes appleFadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
