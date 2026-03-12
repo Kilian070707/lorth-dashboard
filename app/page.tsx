@@ -385,9 +385,9 @@ export default function Dashboard() {
           <X className="w-6 h-6" />
         </button>
 
-        <a href="https://lorth-solutions.fr" target="_blank" rel="noopener noreferrer" className="pt-10 pb-8 flex justify-center items-center">
-          <img src="/logo-lorth.svg" alt="LORTH" className="w-36 md:w-44 h-auto object-contain" />
-        </a>
+        <div className="py-6 flex justify-center items-center">
+          <img src="/logo-lorth.svg" alt="LORTH" className="w-44 md:w-52 h-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
+        </div>
         
         <div className="px-4 mb-6">
           <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl focus-within:border-blue-500/50 focus-within:bg-white/10 transition-colors group cursor-text">
