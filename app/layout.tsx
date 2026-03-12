@@ -17,21 +17,24 @@ export const viewport: Viewport = {
   themeColor: "#020408",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1, // Empêche le zoom intempestif sur mobile quand on tape sur un input
+  maximumScale: 1,
+  userScalable: false, // Empêche le zoom sur les inputs iOS
 };
 
 // 2. Mise à jour des métadonnées et connexion avec iOS
 export const metadata: Metadata = {
   title: "LORTH Command Center",
   description: "Système d'acquisition et Mailbox LORTH",
-  manifest: "/manifest.json", // On lie ton manifest ici
+  manifest: "/manifest.json", 
   appleWebApp: {
-    capable: true, // Dit à l'iPhone que c'est une web app
-    statusBarStyle: "black-translucent", // Rend la barre des tâches iOS jolie
+    capable: true,
+    statusBarStyle: "black-translucent",
     title: "LORTH",
   },
   icons: {
-    apple: "/icon-192.png", // C'est CA que l'iPhone va chercher pour ton écran d'accueil
+    icon: "/apple-touch-icon.png", // Utilise ton nouveau logo pour l'onglet du navigateur
+    shortcut: "/apple-touch-icon.png",
+    apple: "/apple-touch-icon.png", // Utilise le fichier que tu as dans public pour l'iPhone
   },
 };
 
@@ -41,8 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // 3. Changement de la langue en français
-    <html lang="fr">
+    <html lang="fr" className="bg-[#020408]">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#020408] text-white`}
       >
