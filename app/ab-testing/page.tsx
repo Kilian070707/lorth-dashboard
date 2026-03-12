@@ -209,7 +209,7 @@ export default function ABTesting() {
       <aside className={`fixed md:relative z-[100] w-64 h-[100dvh] border-r border-white/5 bg-[#03060D] flex flex-col transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
         <button onClick={() => setMobileMenuOpen(false)} className="md:hidden absolute top-6 right-4 p-2 text-slate-400 hover:text-white"><X className="w-6 h-6" /></button>
         <a href="https://lorth-solutions.fr" target="_blank" rel="noopener noreferrer" className="pt-10 pb-8 flex justify-center items-center">
-          <img src="/logo-lorth.svg" alt="LORTH" className="h-10 md:h-12 w-auto object-contain" />
+          <img src="/logo-lorth.svg" alt="LORTH" className="w-36 md:w-44 h-auto object-contain" />
         </a>
         
         <div className="px-4 mb-6">
