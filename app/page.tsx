@@ -386,7 +386,7 @@ export default function Dashboard() {
         </button>
 
         <a href="https://lorth-solutions.fr" target="_blank" rel="noopener noreferrer" className="pt-10 pb-8 flex justify-center items-center">
-          <img src="/logo-lorth.png" alt="LORTH" className="h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] block" />
+          <img src="/logo-lorth.svg" alt="LORTH" className="h-10 md:h-12 w-auto object-contain" />
         </a>
         
         <div className="px-4 mb-6">

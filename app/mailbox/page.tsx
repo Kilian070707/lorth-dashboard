@@ -396,8 +396,8 @@ function MailboxContent() {
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .fast-spin { animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
+                @keyframes spin { 100% { transform: rotate(360deg); } }
+        .fast-spin { animation: spin 0.5s linear infinite; }
       `}</style>
 
       {/* --- MODALES DOSSIERS --- */}
@@ -494,7 +494,7 @@ function MailboxContent() {
         </button>
 
         <a href="https://lorth-solutions.fr" target="_blank" rel="noopener noreferrer" className="pt-10 pb-8 flex justify-center items-center">
-          <img src="/logo-lorth.png" alt="LORTH" className="h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] block" />
+          <img src="/logo-lorth.svg" alt="LORTH" className="h-10 md:h-12 w-auto object-contain" />
         </a>
         
         <div className="px-4 mb-6">
@@ -612,16 +612,18 @@ function MailboxContent() {
 
           <div className={`w-full md:w-1/3 md:max-w-[360px] border-r border-white/5 bg-[#050811] flex-col overflow-hidden z-10 relative ${isMobileChatOpen ? 'hidden md:flex' : 'flex'}`}>
             
-            <div className="p-4 border-b border-white/5 bg-[#03060D] md:bg-[#03060D]/50 relative flex items-center gap-3 pt-[max(1rem,env(safe-area-inset-top))] md:pt-4">
-              <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors flex-shrink-0">
-                <Menu className="w-5 h-5" />
-              </button>
-              
-              <button onClick={() => setShowCentralMenu(!showCentralMenu)} className="flex-1 flex items-center justify-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 transition-colors group cursor-pointer">
-                <span className="text-[13px] font-extrabold text-white uppercase tracking-wider truncate">{getViewTitle()}</span>
-                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors flex-shrink-0 ${currentView === 'urgent' && !searchQuery ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-300'}`}>{displayLeads.length}</span>
-                {searchQuery === '' && <ChevronDown className={`w-4 h-4 text-slate-500 flex-shrink-0 transition-transform duration-300 ${showCentralMenu ? 'rotate-180' : ''}`} />}
-              </button>
+            <div className="p-4 border-b border-white/5 bg-[#03060D] md:bg-[#03060D]/50 relative pt-[max(1rem,env(safe-area-inset-top))] md:pt-4">
+              <div className="flex items-center gap-3">
+                <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors flex-shrink-0">
+                  <Menu className="w-5 h-5" />
+                </button>
+                
+                <button onClick={() => setShowCentralMenu(!showCentralMenu)} className="flex-1 flex items-center justify-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 transition-colors group cursor-pointer">
+                  <span className="text-[13px] font-extrabold text-white uppercase tracking-wider truncate">{getViewTitle()}</span>
+                  <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors flex-shrink-0 ${currentView === 'urgent' && !searchQuery ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-300'}`}>{displayLeads.length}</span>
+                  {searchQuery === '' && <ChevronDown className={`w-4 h-4 text-slate-500 flex-shrink-0 transition-transform duration-300 ${showCentralMenu ? 'rotate-180' : ''}`} />}
+                </button>
+              </div>
               
               {showCentralMenu && searchQuery === '' && (
                   <div className="absolute top-full left-4 right-4 mt-2 bg-[#0A0F1C] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in slide-in-from-top-2">
