@@ -356,7 +356,7 @@ export default function Dashboard() {
         @keyframes appleFadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .animate-apple-fade { animation: appleFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .fast-spin { animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
+        .fast-spin { animation: spin 0.5s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
 

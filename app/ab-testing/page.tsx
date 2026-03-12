@@ -190,7 +190,7 @@ export default function ABTesting() {
     <div className="flex h-[100dvh] bg-[#020408] text-white font-sans antialiased overflow-hidden relative">
       <style>{`
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .fast-spin { animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
+        .fast-spin { animation: spin 0.5s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
       `}</style>
 
