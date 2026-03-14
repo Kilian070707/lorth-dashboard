@@ -2,26 +2,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Users, Zap, Video, CheckCircle, TrendingUp, AlertCircle, RefreshCcw, ArrowUpRight, ArrowDownRight, Activity, MessageCircle, Info, ExternalLink, Linkedin, Database, Settings, Bot, Mail, MessageSquare, Search, Menu, X, CalendarDays, ChevronLeft, ChevronRight, Beaker } from 'lucide-react';
+import Sidebar from '@/components/Sidebar';
+import { Activity, Users, Video, CheckCircle, TrendingUp, AlertCircle, RefreshCcw, ArrowUpRight, ArrowDownRight, MessageCircle, Info, ExternalLink, MessageSquare, Search, Menu, X, CalendarDays, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { useLoading } from './contexts/LoadingContext';
 
 type TimeRange = 'today' | 'week' | 'month' | 'year' | 'all' | 'custom';
 
-const ClaudeIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M14.5 2.5h3L10 21.5H7l7.5-19z M6 21.5H3l4-10h3l-4 10z" />
-  </svg>
-);
-
-const PerplexityIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v3h3v2h-3v3h-2v-3H8v-2h3V7z" />
-  </svg>
-);
-
 export default function Dashboard() {
   const router = useRouter();
+  const { loading: globalLoading, setLoading: setGlobalLoading } = useLoading();
   const [mounted, setMounted] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoadingState] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [allLeads, setAllLeads] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState<TimeRange>('month');
@@ -35,6 +27,10 @@ export default function Dashboard() {
   const [statInfo, setStatInfo] = useState<{title: string, description: string} | null>(null);
   const [dashSearch, setDashSearch] = useState("");
 
+  useEffect(() => {
+    setGlobalLoading(false);
+  }, [setGlobalLoading]);
+
   const handleLogout = async () => {
     await fetch('/api/logout', { method: 'POST' });
     router.push('/login');
@@ -42,7 +38,7 @@ export default function Dashboard() {
   };
 
   const loadData = async () => {
-    setLoading(true);
+    setLoadingState(true);
     try {
       const res = await fetch('/api/leads');
       const data = await res.json();
@@ -52,7 +48,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Erreur API", err);
     } finally {
-      setLoading(false); 
+      setLoadingState(false); 
     }
   };
 
@@ -352,14 +348,6 @@ export default function Dashboard() {
   return (
     <div className="flex h-[100dvh] bg-[#020408] text-slate-100 font-sans antialiased overflow-hidden relative">
 
-      <style>{`
-        @keyframes appleFadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .animate-apple-fade { animation: appleFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .fast-spin { animation: spin 0.5s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite; }
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-      `}</style>
-
       {/* MODALE D'EXPLICATION DES STATS */}
       {statInfo && (
         <div className="absolute inset-0 z-[150] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setStatInfo(null)}>
@@ -370,7 +358,7 @@ export default function Dashboard() {
             <h3 className="text-lg font-extrabold text-white mb-2"><span>{statInfo.title}</span></h3>
             <p className="text-slate-400 text-sm mb-6 leading-relaxed"><span>{statInfo.description}</span></p>
             <button onClick={() => setStatInfo(null)} className="w-full py-2.5 rounded-xl font-bold text-sm bg-white/5 hover:bg-white/10 text-white transition-all border border-white/5">
-              <span>J'ai compris</span>
+              <span>J&apos;ai compris</span>
             </button>
           </div>
         </div>
@@ -382,292 +370,220 @@ export default function Dashboard() {
       )}
 
       {/* SIDEBAR FIXE ET RESPONSIVE */}
-      <aside className={`fixed md:relative z-[100] w-64 h-[100dvh] border-r border-white/5 bg-[#03060D] flex flex-col transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
-        
-        <button onClick={() => setMobileMenuOpen(false)} className="md:hidden absolute top-6 right-4 p-2 text-slate-400 hover:text-white">
-          <X className="w-6 h-6" />
-        </button>
+      <Sidebar 
+        mobileMenuOpen={mobileMenuOpen} 
+        setMobileMenuOpen={setMobileMenuOpen}
+        dashSearch={dashSearch}
+        setDashSearch={setDashSearch}
+        handleDashSearch={handleDashSearch}
+      />
 
-        <div className="py-10 flex justify-center items-center">
-          <button onClick={handleLogout} className="p-2 touch-manipulation active:scale-95 transition-transform outline-none group">
-            <img src="/logo-lorth.svg" alt="LORTH" className="w-28 md:w-38 h-auto object-contain group-hover:opacity-100" />
-          </button>
-        </div>
-        
-        <div className="px-4 mb-6">
-          <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl focus-within:border-blue-500/50 focus-within:bg-white/10 transition-colors group cursor-text">
-            <Search className="w-4 h-4 text-slate-400" />
-            <input 
-              id="dashSearchInput"
-              type="text" 
-              placeholder="Rechercher..." 
-              value={dashSearch}
-              onChange={(e) => setDashSearch(e.target.value)}
-              onKeyDown={handleDashSearch}
-              className="bg-transparent border-none outline-none text-[13px] font-medium text-white placeholder-slate-500 flex-1 w-full"
-            />
-            <span className="hidden md:inline-block text-[10px] font-bold bg-white/10 px-1.5 py-0.5 rounded text-slate-400">⌘K</span>
-          </div>
-        </div>
-
-        <div className="px-4 flex-1 overflow-y-auto no-scrollbar">
-          <nav className="space-y-2">
-            <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-blue-500/10 text-blue-400 font-bold border border-blue-500/10 transition-all">
-              <Activity className="w-4 h-4" />
-              <span className="text-sm">Dashboard</span>
-            </button>
-            <button onClick={() => router.push('/ab-testing')} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group cursor-pointer">
-              <Beaker className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
-              <span className="text-sm">A/B Testing</span>
-            </button>
-            <button onClick={() => router.push('/mailbox')} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group cursor-pointer">
-              <Zap className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
-              <span className="text-sm">Mailbox</span>
-            </button>
-          </nav>
-
-          <div className="pt-8 pb-3 border-t border-white/5 mt-6">
-            <p className="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest">Outils Externes</p>
-          </div>
-          
-          <nav className="space-y-1.5 pb-6">
-            <a href="https://core.lorth-solutions.fr/projects/Q4LLvhM8ArK2SLzv/folders/M6CDLc1Ut2vjhwtP/workflows" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group">
-              <div className="flex items-center gap-3"><Settings className="w-4 h-4 text-slate-500 group-hover:text-orange-400" /><span className="text-[13px]">n8n</span></div>
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-            <a href="https://crm.lorth-solutions.fr/dashboard/#/nc/pbn3gbkprxor0gd/mhoa1urs9qyy1l0/vwe9ebbcdyw4w9yy/crm-lorth-crm-complet" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group">
-              <div className="flex items-center gap-3"><Database className="w-4 h-4 text-slate-500 group-hover:text-blue-400" /><span className="text-[13px]">CRM</span></div>
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-            <a href="https://app.trulyinbox.com/warmup" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group">
-              <div className="flex items-center gap-3"><Mail className="w-4 h-4 text-slate-500 group-hover:text-emerald-400" /><span className="text-[13px]">TrulyInbox</span></div>
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-            <a href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group">
-              <div className="flex items-center gap-3"><Bot className="w-4 h-4 text-slate-500 group-hover:text-purple-400" /><span className="text-[13px]">Gemini</span></div>
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-            <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group">
-              <div className="flex items-center gap-3"><ClaudeIcon className="w-4 h-4 text-slate-500 group-hover:text-[#D97757]" /><span className="text-[13px]">Claude</span></div>
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-            <a href="https://www.perplexity.ai/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group">
-              <div className="flex items-center gap-3"><PerplexityIcon className="w-4 h-4 text-slate-500 group-hover:text-teal-400" /><span className="text-[13px]">Perplexity</span></div>
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-            <a href="https://www.linkedin.com/in/lorth/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all font-medium group">
-              <div className="flex items-center gap-3"><Linkedin className="w-4 h-4 text-slate-500 group-hover:text-[#0A66C2]" /><span className="text-[13px]">LinkedIn</span></div>
-              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </a>
-          </nav>
-        </div>
-
-        {/* AJOUT DE LA SAFE AREA IOS POUR LE BAS DE LA SIDEBAR */}
-        <div className="p-4 border-t border-white/5 mt-auto bg-[#03060D] pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/[0.02] border border-white/5 cursor-default hover:bg-white/5 transition-colors">
-            <div className="relative flex items-center justify-center w-3 h-3">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-20 animate-ping"></span>
-              <span className="relative inline-flex rounded-full w-2 h-2 bg-emerald-500"></span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[11px] font-bold text-slate-300">Systèmes en ligne</span>
-              <span className="text-[9px] font-medium text-slate-500">n8n & NocoDB Sync</span>
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
-      {/* ZONE CENTRALE : Le contenu de la page */}
       <main className="flex-1 flex flex-col h-[100dvh] relative overflow-hidden min-w-0">
-        
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none hidden md:block"></div>
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none md:hidden"></div>
-        
-        {loading ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500">
-             <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full fast-spin"></div>
-             <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500"><span>Chargement</span></span>
-          </div>
-        ) : (
-          <div className="flex-1 flex flex-col w-full max-w-6xl mx-auto px-4 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] md:pt-10 pb-4 relative z-10 min-h-0">
+        {globalLoading ? <LoadingSpinner /> : (
+          <>
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none hidden md:block"></div>
+            <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none md:hidden"></div>
             
-            <header className="flex flex-col xl:flex-row xl:justify-between xl:items-end gap-6 mb-8 md:mb-14">
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2 md:gap-0">
-                  <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors flex-shrink-0 mr-1">
-                    <Menu className="w-6 h-6" />
-                  </button>
-                  <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight"><span>Dashboard Visuel</span></h1>
-                </div>
-                <p className="text-slate-400 text-xs md:text-[13px] font-medium mt-1 md:mt-2 ml-10 md:ml-0"><span>Performances d'acquisition en temps réel.</span></p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <div className="flex-1 flex flex-col w-full max-w-6xl mx-auto px-4 md:px-8 pt-[max(1rem,env(safe-area-inset-top))] md:pt-8 pb-4 relative z-10 min-h-0 h-full">
                 
-                {timeRange === 'custom' && (
-                  <div className="relative flex justify-center animate-in fade-in slide-in-from-right-4 w-full sm:w-auto">
-                    <button onClick={() => setShowDatePicker(!showDatePicker)} className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-5 py-2 text-xs font-bold transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] w-full sm:w-auto">
-                      <CalendarDays className="w-4 h-4" />
-                      <span>{getDateLabel()}</span>
+                {/* HEADER ALIGNÉ COMME 'TO DO' */}
+                <header className="flex flex-col xl:flex-row xl:justify-between xl:items-start gap-4 mb-6 md:mb-8 flex-shrink-0">
+                  <div className="flex items-start gap-3">
+                    <button onClick={() => setMobileMenuOpen(true)} className="md:hidden mt-1 p-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors flex-shrink-0">
+                      <Menu size={24} />
                     </button>
+                    <div className="flex gap-4 items-center">
+                      <div className="p-2.5 bg-blue-500/10 rounded-xl border border-blue-500/20 shadow-[0_0_15px_rgba(37,99,235,0.15)] flex-shrink-0">
+                        <Activity size={32} className="text-blue-400" />
+                      </div>
+                      <div className="flex flex-col gap-0.5 justify-center">
+                        <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-none">
+                          Dashboard Visuel
+                        </h1>
+                        <p className="text-slate-400 text-xs md:text-[13px] font-medium">
+                          Performances d&apos;acquisition en temps réel.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto mt-2 xl:mt-0">
+                    
+                    {timeRange === 'custom' && (
+                      <div className="relative flex justify-center animate-in fade-in slide-in-from-right-4 w-full sm:w-auto">
+                        <button onClick={() => setShowDatePicker(!showDatePicker)} className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-5 py-2 text-xs font-bold transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] w-full sm:w-auto">
+                          <CalendarDays className="w-4 h-4" />
+                          <span>{getDateLabel()}</span>
+                        </button>
 
-                    {showDatePicker && (
-                      <div className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto bg-[#0A0F1C] border border-white/10 rounded-2xl shadow-2xl z-[250] animate-in slide-in-from-top-2 origin-top">
-                        {renderCalendar()}
+                        {showDatePicker && (
+                          <div className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto bg-[#0A0F1C] border border-white/10 rounded-2xl shadow-2xl z-[250] animate-in slide-in-from-top-2 origin-top">
+                            {renderCalendar()}
+                          </div>
+                        )}
                       </div>
                     )}
-                  </div>
-                )}
 
-                <div className="flex items-center justify-between bg-[#0A0F1C] border border-white/10 rounded-lg p-1 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar flex-1 sm:flex-none">
-                  <button onClick={() => {setTimeRange('today'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'today' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>24h</span></button>
-                  <button onClick={() => {setTimeRange('week'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'week' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>7J</span></button>
-                  <button onClick={() => {setTimeRange('month'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'month' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>30J</span></button>
-                  <button onClick={() => {setTimeRange('year'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'year' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>12M</span></button>
-                  <button onClick={() => {setTimeRange('all'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'all' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>Global</span></button>
-                  <div className="w-px h-4 bg-white/10 mx-1 shrink-0 hidden sm:block"></div>
-                  <button onClick={() => setTimeRange('custom')} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'custom' ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-white'}`}><span>Dates</span></button>
-                </div>
-                <button onClick={loadData} className="flex-shrink-0 hidden sm:flex items-center justify-center w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">
-                  <RefreshCcw className="w-4 h-4 text-slate-300" />
-                </button>
-              </div>
-            </header>
-
-            <div className="flex-1 overflow-y-auto no-scrollbar -mx-4 md:-mx-8 px-4 md:px-8 pb-[calc(3rem+env(safe-area-inset-bottom))]">
-              
-              <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-4 mb-8">
-                
-                {/* Pipeline Actif */}
-                <div onClick={() => openStatInfo("Pipeline Actif", "Valeur estimée du pipeline basée sur les leads ayant un statut 'Vidéo à tourner', 'Question à traiter', ou 'En conversation'. Chaque lead est valorisé à 2500€.")} className="bg-[#0A0F1C] border border-yellow-500/20 p-2.5 sm:p-5 rounded-2xl shadow-[0_0_20px_rgba(234,179,8,0.08)] flex flex-col justify-between aspect-square relative overflow-hidden hover:border-yellow-500/40 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 blur-[40px] rounded-full pointer-events-none"></div>
-                  <div className="flex justify-between items-start relative z-10 w-full">
-                    <div className="p-1.5 sm:p-2 bg-yellow-500/20 rounded-lg"><Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" /></div>
-                  </div>
-                  <div className="relative z-10 mt-auto">
-                    <h3 className="text-[15px] sm:text-2xl font-black text-white tracking-tight leading-none"><span>{formatPipeline(stats.pipelineValue)}</span></h3>
-                    <p className="text-[8px] sm:text-[10px] font-bold text-yellow-400/80 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Pipeline</span></p>
-                  </div>
-                </div>
-
-                {/* Leads Contactés */}
-                <div onClick={() => openStatInfo("Leads Contactés", "Le nombre total de prospects uniques ayant reçu au moins un e-mail de vos séquences sur la période sélectionnée.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start w-full">
-                    <div className="p-1.5 sm:p-2 bg-blue-500/10 rounded-lg"><Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" /></div>
-                    <DiffBadge value={stats.diffs.totalLeads} />
-                  </div>
-                  <div className="mt-auto">
-                    <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.totalLeads}</span></h3>
-                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Leads</span></p>
-                  </div>
-                </div>
-
-                {/* Taux de Réponse */}
-                <div onClick={() => openStatInfo("Taux de Réponse", "Le pourcentage de prospects qui ont répondu à vos emails.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start w-full">
-                    <div className="p-1.5 sm:p-2 bg-emerald-500/10 rounded-lg"><TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" /></div>
-                    <DiffBadge value={stats.diffs.replyRate} isRate={true} />
-                  </div>
-                  <div className="mt-auto">
-                    <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.replyRate}%</span></h3>
-                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Réponses</span></p>
-                  </div>
-                </div>
-
-                {/* Vidéos à Tourner */}
-                <div onClick={() => openStatInfo("Vidéos à Tourner", "Leads qualifiés attendant une vidéo sur-mesure.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start w-full">
-                    <div className="p-1.5 sm:p-2 bg-purple-500/10 rounded-lg"><Video className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400" /></div>
-                    <DiffBadge value={stats.diffs.videosPending} />
-                  </div>
-                  <div className="mt-auto">
-                    <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.videosPending}</span></h3>
-                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Vidéos</span></p>
-                  </div>
-                </div>
-
-                {/* Outreach Successful */}
-                <div onClick={() => openStatInfo("Outreach Successful", "Nombre de leads convertis ou traités avec succès.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                  <div className="flex justify-between items-start w-full">
-                    <div className="p-1.5 sm:p-2 bg-teal-500/10 rounded-lg"><CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400" /></div>
-                    <DiffBadge value={stats.diffs.objectionsWon} />
-                  </div>
-                  <div className="mt-auto">
-                    <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.objectionsWon}</span></h3>
-                    <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Succès</span></p>
-                  </div>
-                </div>
-
-                {/* Conversations en cours */}
-                <div onClick={() => openStatInfo("Conversations en cours", "Leads attendant une réponse humaine de votre part.")} className="bg-[#0A0F1C] border border-white/5 p-2.5 sm:p-5 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
-                    <div className="flex justify-between items-start w-full">
-                      <div className="p-1.5 sm:p-2 bg-orange-500/10 rounded-lg"><MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400" /></div>
-                      <DiffBadge value={stats.diffs.ongoingConversations} />
+                    <div className="flex items-center justify-between bg-[#0A0F1C] border border-white/10 rounded-lg p-1 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar flex-1 sm:flex-none">
+                      <button onClick={() => {setTimeRange('today'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'today' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>24h</span></button>
+                      <button onClick={() => {setTimeRange('week'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'week' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>7J</span></button>
+                      <button onClick={() => {setTimeRange('month'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'month' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>30J</span></button>
+                      <button onClick={() => {setTimeRange('year'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'year' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>12M</span></button>
+                      <button onClick={() => {setTimeRange('all'); setShowDatePicker(false);}} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'all' ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'}`}><span>Global</span></button>
+                      <div className="w-px h-4 bg-white/10 mx-1 shrink-0 hidden sm:block"></div>
+                      <button onClick={() => setTimeRange('custom')} className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 sm:py-1.5 text-[11px] sm:text-xs font-bold rounded-md transition-colors text-center whitespace-nowrap ${timeRange === 'custom' ? 'bg-blue-500/20 text-blue-400' : 'text-slate-400 hover:text-white'}`}><span>Dates</span></button>
                     </div>
-                    <div className="mt-auto">
-                      <h3 className="text-base sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.ongoingConversations}</span></h3>
-                      <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>En cours</span></p>
-                    </div>
-                </div>
-
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
-                
-                <div className="lg:col-span-2 bg-[#0A0F1C] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col">
-                  <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-4"><span>Acquisition</span></h3>
-                  <div className="flex-1 w-full min-h-[280px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={stats.graphData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
-                        <defs><linearGradient id="colorReplies" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/><stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/></linearGradient></defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                        <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" fontSize={11} tickMargin={10} axisLine={false} />
-                        <YAxis stroke="rgba(255,255,255,0.3)" fontSize={11} tickMargin={10} axisLine={false} allowDecimals={false} />
-                        <Tooltip contentStyle={{ backgroundColor: '#0A0F1C', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontWeight: 'bold', fontSize: '12px', padding: '10px 14px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }} itemStyle={{ color: '#60A5FA' }} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '5 5' }}/>
-                        <Area type="monotone" dataKey="réponses" stroke="#3B82F6" strokeWidth={3} fillOpacity={1} fill="url(#colorReplies)" activeDot={{ r: 6, fill: '#3B82F6', stroke: '#0A0F1C', strokeWidth: 3 }} />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                    <button onClick={loadData} className="flex-shrink-0 hidden sm:flex items-center justify-center w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors">
+                      <RefreshCcw className="w-4 h-4 text-slate-300" />
+                    </button>
                   </div>
-                </div>
+                </header>
 
-                <div className="lg:col-span-1 flex flex-col gap-6">
-                  <div className="bg-[#0A0F1C] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col flex-1">
-                    <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-2"><span>Analyse des Objections</span></h3>
-                    {stats.objectionTypesData.length > 0 ? (
-                      <div className="flex-1 w-full min-h-[160px] flex items-center justify-center">
+                {/* ZONE SCROLLABLE ADAPTATIVE : flex-1 min-h-0 empêche le débordement */}
+                <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar -mx-4 md:-mx-8 px-4 md:px-8 pb-2">
+                  
+                  {/* LIGNE DES 6 KPIs : margin et padding réduits */}
+                  <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3 mb-6 flex-shrink-0">
+                    
+                    {/* Pipeline Actif */}
+                    <div onClick={() => openStatInfo("Pipeline Actif", "Valeur estimée du pipeline basée sur les leads ayant un statut 'Vidéo à tourner', 'Question à traiter', ou 'En conversation'. Chaque lead est valorisé à 2500€.")} className="bg-[#0A0F1C] border border-yellow-500/20 p-3 sm:p-4 rounded-2xl shadow-[0_0_20px_rgba(234,179,8,0.08)] flex flex-col justify-between aspect-square relative overflow-hidden hover:border-yellow-500/40 hover:scale-[1.02] transition-all cursor-pointer group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 blur-[40px] rounded-full pointer-events-none"></div>
+                      <div className="flex justify-between items-start relative z-10 w-full">
+                        <div className="p-1.5 sm:p-2 bg-yellow-500/20 rounded-lg"><Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" /></div>
+                      </div>
+                      <div className="relative z-10 mt-auto">
+                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-none"><span>{formatPipeline(stats.pipelineValue)}</span></h3>
+                        <p className="text-[8px] sm:text-[10px] font-bold text-yellow-400/80 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Pipeline</span></p>
+                      </div>
+                    </div>
+
+                    {/* Leads Contactés */}
+                    <div onClick={() => openStatInfo("Leads Contactés", "Le nombre total de prospects uniques ayant reçu au moins un e-mail de vos séquences sur la période sélectionnée.")} className="bg-[#0A0F1C] border border-white/5 p-3 sm:p-4 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                      <div className="flex justify-between items-start w-full">
+                        <div className="p-1.5 sm:p-2 bg-blue-500/10 rounded-lg"><Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" /></div>
+                        <DiffBadge value={stats.diffs.totalLeads} />
+                      </div>
+                      <div className="mt-auto">
+                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.totalLeads}</span></h3>
+                        <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Leads</span></p>
+                      </div>
+                    </div>
+
+                    {/* Taux de Réponse */}
+                    <div onClick={() => openStatInfo("Taux de Réponse", "Le pourcentage de prospects qui ont répondu à vos emails.")} className="bg-[#0A0F1C] border border-white/5 p-3 sm:p-4 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                      <div className="flex justify-between items-start w-full">
+                        <div className="p-1.5 sm:p-2 bg-emerald-500/10 rounded-lg"><TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" /></div>
+                        <DiffBadge value={stats.diffs.replyRate} isRate={true} />
+                      </div>
+                      <div className="mt-auto">
+                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.replyRate}%</span></h3>
+                        <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Réponses</span></p>
+                      </div>
+                    </div>
+
+                    {/* Vidéos à Tourner */}
+                    <div onClick={() => openStatInfo("Vidéos à Tourner", "Leads qualifiés attendant une vidéo sur-mesure.")} className="bg-[#0A0F1C] border border-white/5 p-3 sm:p-4 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                      <div className="flex justify-between items-start w-full">
+                        <div className="p-1.5 sm:p-2 bg-purple-500/10 rounded-lg"><Video className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400" /></div>
+                        <DiffBadge value={stats.diffs.videosPending} />
+                      </div>
+                      <div className="mt-auto">
+                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.videosPending}</span></h3>
+                        <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Vidéos</span></p>
+                      </div>
+                    </div>
+
+                    {/* Outreach Successful */}
+                    <div onClick={() => openStatInfo("Outreach Successful", "Nombre de leads convertis ou traités avec succès.")} className="bg-[#0A0F1C] border border-white/5 p-3 sm:p-4 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                      <div className="flex justify-between items-start w-full">
+                        <div className="p-1.5 sm:p-2 bg-teal-500/10 rounded-lg"><CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-teal-400" /></div>
+                        <DiffBadge value={stats.diffs.objectionsWon} />
+                      </div>
+                      <div className="mt-auto">
+                        <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.objectionsWon}</span></h3>
+                        <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>Succès</span></p>
+                      </div>
+                    </div>
+
+                    {/* Conversations en cours */}
+                    <div onClick={() => openStatInfo("Conversations en cours", "Leads attendant une réponse humaine de votre part.")} className="bg-[#0A0F1C] border border-white/5 p-3 sm:p-4 rounded-2xl shadow-xl flex flex-col justify-between aspect-square hover:bg-white/[0.03] hover:border-white/10 hover:scale-[1.02] transition-all cursor-pointer group">
+                        <div className="flex justify-between items-start w-full">
+                          <div className="p-1.5 sm:p-2 bg-orange-500/10 rounded-lg"><MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400" /></div>
+                          <DiffBadge value={stats.diffs.ongoingConversations} />
+                        </div>
+                        <div className="mt-auto">
+                          <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-none"><span>{stats.ongoingConversations}</span></h3>
+                          <p className="text-[8px] sm:text-[10px] font-bold text-slate-500 mt-1 sm:mt-1.5 uppercase tracking-wider truncate"><span>En cours</span></p>
+                        </div>
+                    </div>
+
+                  </div>
+
+                  {/* ZONE GRAPHIQUES COMPRESSIBLE : prend l'espace restant */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
+                    
+                    {/* Grand Graphique : min-height réduit et flex-1 pour absorber l'espace */}
+                    <div className="lg:col-span-2 bg-[#0A0F1C] border border-white/5 p-4 sm:p-5 rounded-2xl shadow-xl flex flex-col h-full min-h-[200px]">
+                      <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-4 flex-shrink-0"><span>Acquisition</span></h3>
+                      <div className="flex-1 w-full min-h-0">
                         <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie data={stats.objectionTypesData} cx="50%" cy="50%" labelLine={false} innerRadius={45} outerRadius={70} fill="#8884d8" dataKey="value" stroke="none">
-                              {stats.objectionTypesData.map((entry, index) => <Cell key={`cell-${index}`} fill={['#3b82f6', '#64748b', '#334155', '#1e293b', '#475569'][index % 5]} />)}
-                            </Pie>
-                            <Tooltip contentStyle={{ backgroundColor: '#03060D', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontWeight: 'bold', fontSize: '12px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}/>
-                            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', fontWeight: '600' }}/>
-                          </PieChart>
+                          <AreaChart data={stats.graphData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+                            <defs><linearGradient id="colorReplies" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/><stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/></linearGradient></defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <XAxis dataKey="date" stroke="rgba(255,255,255,0.3)" fontSize={11} tickMargin={10} axisLine={false} />
+                            <YAxis stroke="rgba(255,255,255,0.3)" fontSize={11} tickMargin={10} axisLine={false} allowDecimals={false} />
+                            <Tooltip contentStyle={{ backgroundColor: '#0A0F1C', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontWeight: 'bold', fontSize: '12px', padding: '10px 14px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }} itemStyle={{ color: '#60A5FA' }} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '5 5' }}/>
+                            <Area type="monotone" dataKey="réponses" stroke="#3B82F6" strokeWidth={3} fillOpacity={1} fill="url(#colorReplies)" activeDot={{ r: 6, fill: '#3B82F6', stroke: '#0A0F1C', strokeWidth: 3 }} />
+                          </AreaChart>
                         </ResponsiveContainer>
                       </div>
-                    ) : (
-                      <div className="flex-1 flex items-center justify-center text-sm font-medium text-slate-500 min-h-[160px]"><span>Aucune donnée d'objection</span></div>
-                    )}
-                  </div>
-                  <div className="bg-[#0A0F1C] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col">
-                    <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-4"><span>Santé Système</span></h3>
-                    <div className="flex flex-col gap-3">
-                      <div className="flex items-center justify-between p-3.5 rounded-xl bg-red-500/5 border border-red-500/10">
-                        <div className="flex items-center gap-3"><AlertCircle className="w-5 h-5 text-red-400" /><div><h4 className="text-sm font-bold text-white"><span>Bounces</span></h4></div></div>
-                        <span className="text-xl font-black text-red-400"><span>{stats.bounced}</span></span>
+                    </div>
+
+                    <div className="lg:col-span-1 flex flex-col gap-4 h-full">
+                      {/* Graphique Circulaire */}
+                      <div className="bg-[#0A0F1C] border border-white/5 p-4 sm:p-5 rounded-2xl shadow-xl flex flex-col flex-1 min-h-[140px]">
+                        <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-2 flex-shrink-0"><span>Analyse des Objections</span></h3>
+                        {stats.objectionTypesData.length > 0 ? (
+                          <div className="flex-1 w-full min-h-0 flex items-center justify-center">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie data={stats.objectionTypesData} cx="50%" cy="50%" labelLine={false} innerRadius={35} outerRadius={60} fill="#8884d8" dataKey="value" stroke="none">
+                                  {stats.objectionTypesData.map((entry, index) => <Cell key={`cell-${index}`} fill={['#3b82f6', '#64748b', '#334155', '#1e293b', '#475569'][index % 5]} />)}
+                                </Pie>
+                                <Tooltip contentStyle={{ backgroundColor: '#03060D', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff', fontWeight: 'bold', fontSize: '12px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}/>
+                                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px', fontWeight: '600' }}/>
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
+                        ) : (
+                          <div className="flex-1 flex items-center justify-center text-sm font-medium text-slate-500"><span>Aucune donnée d&apos;objection</span></div>
+                        )}
                       </div>
-                      <div className="flex items-center justify-between p-3.5 rounded-xl bg-white/5 border border-white/5">
-                        <div className="flex items-center gap-3"><div className="w-5 h-5 rounded-full border-2 border-emerald-500 flex items-center justify-center"><div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div></div><div><h4 className="text-sm font-bold text-white"><span>Serveur n8n</span></h4></div></div>
-                        <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md"><span>Online</span></span>
+                      
+                      {/* Santé Système */}
+                      <div className="bg-[#0A0F1C] border border-white/5 p-4 sm:p-5 rounded-2xl shadow-xl flex flex-col flex-shrink-0">
+                        <h3 className="text-xs font-extrabold text-white uppercase tracking-wider mb-3"><span>Santé Système</span></h3>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between p-3 rounded-xl bg-red-500/5 border border-red-500/10">
+                            <div className="flex items-center gap-2"><AlertCircle className="w-4 h-4 text-red-400" /><div><h4 className="text-sm font-bold text-white"><span>Bounces</span></h4></div></div>
+                            <span className="text-lg font-black text-red-400"><span>{stats.bounced}</span></span>
+                          </div>
+                          <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                            <div className="flex items-center gap-2"><div className="w-4 h-4 rounded-full border-2 border-emerald-500 flex items-center justify-center"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div></div><div><h4 className="text-sm font-bold text-white"><span>Serveur n8n</span></h4></div></div>
+                            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md"><span>Online</span></span>
+                          </div>
+                        </div>
                       </div>
                     </div>
+
                   </div>
                 </div>
-
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
       </main>
     </div>

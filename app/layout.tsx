@@ -23,14 +23,15 @@ export const viewport: Viewport = {
 
 // 2. Mise à jour des métadonnées avec ton nouveau favicon SVG
 export const metadata: Metadata = {
-  title: "LORTH Command Center",
-  description: "Système d'acquisition et Mailbox LORTH",
+  title: "LORTH Solutions",
+  description: "Application de gestion LORTH",
   manifest: "/manifest.json", 
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "LORTH",
+    title: "LORTH", // LORTH Solutions
   },
+  //
   icons: {
     icon: [
       {
@@ -43,17 +44,38 @@ export const metadata: Metadata = {
   },
 };
 
+import { LoadingProvider } from "./contexts/LoadingContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="bg-[#020408]">
+    <html lang="fr" className="bg-[#020408]" suppressHydrationWarning>
+      <head>
+        <style>{`
+          @keyframes appleFadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+          .animate-apple-fade { animation: appleFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+          .animate-apple-fade-delay { opacity: 0; animation: appleFadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s forwards; }
+          
+          @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+          .animate-slide-up { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+          
+          ::-webkit-scrollbar { width: 6px; height: 6px; }
+          ::-webkit-scrollbar-track { background: transparent; }
+          ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+          ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+          .no-scrollbar::-webkit-scrollbar { display: none; }
+        `}</style>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#020408] text-white`}
+        suppressHydrationWarning
       >
-        {children}
+        <LoadingProvider>
+          {children}
+        </LoadingProvider>
       </body>
     </html>
   );

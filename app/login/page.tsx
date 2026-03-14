@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,6 +44,7 @@ export default function LoginPage() {
   return (
     // min-h-[100dvh] est crucial pour l'iPhone (gère la barre de navigation Safari qui monte/descend)
     <div className="min-h-[100dvh] bg-[#020408] flex flex-col justify-center items-center p-5 relative overflow-hidden font-sans">
+      {loading && <LoadingSpinner />}
       
       {/* Grille de fond Tech */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:32px_32px]"></div>
@@ -58,7 +60,7 @@ export default function LoginPage() {
           <img 
             src="/logo-lorth.svg" 
             alt="LORTH" 
-            className="w-28 md:w-38 h-auto object-contain" 
+            className="w-32 md:w-38 h-auto object-contain" 
           />
         </div>
 

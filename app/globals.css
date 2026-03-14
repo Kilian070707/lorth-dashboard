@@ -22,3 +22,6 @@ body {
   /* J'ai supprimé la ligne font-family qui cassait la police Geist ! 
      Tailwind (via le @theme inline) s'en charge très bien tout seul. */
 }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.fast-spin { animation: spin 0.5s linear infinite; }
