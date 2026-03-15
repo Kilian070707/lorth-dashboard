@@ -1,24 +1,26 @@
-    // Fichier : app/api/todo/route.ts
+// Fichier : app/api/todo/route.ts
 import { NextResponse } from 'next/server';
 
-const NOCODB_URL = process.env.NOCODB_URL || 'https://crm.lorth-solutions.fr';
-const NOCODB_TOKEN = process.env.NOCODB_API_TOKEN || 'TON_VRAI_TOKEN_ICI'; // <-- N'oublie pas de mettre ton vrai token NocoDB ici (ou dans ton .env)
+export const runtime = 'edge';
+
+const NOCODB_URL = process.env.NOCODB_URL;
+const NOCODB_TOKEN = process.env.NOCODB_API_TOKEN;
 const TABLE_ID = 'mhoa1urs9qyy1l0'; // L'ID de ta table CRM LORTH
 
 const headers = {
-  'xc-token': NOCODB_TOKEN,
+  'xc-token': NOCODB_TOKEN as string,
   'Content-Type': 'application/json',
 };
 
 // --- GET : Récupérer les leads du jour ---
 export async function GET() {
   try {
-    // 1. Récupérer les "Interactions"
-    const resInt = await fetch(`${NOCODB_URL}/api/v2/tables/${TABLE_ID}/records?where=(Statut,eq,VIP à chauffer)&limit=15&sort=-Score via site`, { headers });
+    // 1. Récupérer les "Interactions" (%20 remplace les espaces pour éviter les erreurs d'URL)
+    const resInt = await fetch(`${NOCODB_URL}/api/v2/tables/${TABLE_ID}/records?where=(Statut,eq,VIP à chauffer)&limit=15&sort=-Score%20via%20site`, { headers });
     const dataInt = await resInt.json();
 
     // 2. Récupérer les "Ajouts"
-    const resAjout = await fetch(`${NOCODB_URL}/api/v2/tables/${TABLE_ID}/records?where=(Statut,eq,VIP Interagi)&limit=15&sort=-Score via site`, { headers });
+    const resAjout = await fetch(`${NOCODB_URL}/api/v2/tables/${TABLE_ID}/records?where=(Statut,eq,VIP Interagi)&limit=15&sort=-Score%20via%20site`, { headers });
     const dataAjout = await resAjout.json();
 
     const formatLead = (l: any) => ({
@@ -52,7 +54,7 @@ export async function POST(request: Request) {
       recordsToUpdate = ids.map((id: string) => ({
         Id: id,
         Statut: type === 'interactions' ? 'VIP Interagi' : 'En chauffe LinkedIn',
-        ...(type === 'ajouts' ? { 'Date_Ajout_LinkedIn': today } : {})
+        ...(type === 'ajouts' ? { 'Date Ajout LinkedIn': today } : {}) // Correction de l'espace ici
       }));
     } else if (action === 'manual') {
       for (const [id, status] of Object.entries(selections)) {
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
           recordsToUpdate.push({
             Id: id,
             Statut: type === 'interactions' ? 'VIP Interagi' : 'En chauffe LinkedIn',
-            ...(type === 'ajouts' ? { 'Date_Ajout_LinkedIn': today } : {})
+            ...(type === 'ajouts' ? { 'Date Ajout LinkedIn': today } : {}) // Correction de l'espace ici
           });
         } else if (status === 'error') {
           recordsToUpdate.push({
